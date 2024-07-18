@@ -15,3 +15,5 @@ pip install lxml_html_clean
 * Reader mode styling
     https://mathiasbynens.be/notes/safari-reader-html
     https://gist.github.com/charleyramm/a10a3386489fbbeb0d4f
+
+* See if we can get articles in order

@@ -1,9 +1,12 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: -apple-system, Arial, sans-serif;
     line-height: 1.6;
     margin: 20px;
     max-width: 800px;
     margin: auto;
+    padding:20px;
+    text-rendering: optimizeLegibility;
+    color: #333333;
 }
 
 h1 {
@@ -13,4 +16,14 @@ h1 {
 
 p {
     margin-bottom: 20px;
+}
+
+.section-list a {
+    color: inherit; /* Inherits the color from the parent element */
+    text-decoration: none; /* Removes the underline */
+    font: inherit; /* Inherits font properties from the parent element */
+}
+
+.section-list a:visited {
+    color: #AAAAAA;
 }

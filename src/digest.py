@@ -6,6 +6,7 @@ import browsercookie
 import re
 import os
 from datetime import datetime
+import shutil
 
 BASE_URL = "https://www.economist.com"
 WEEKLY_URL = f"{BASE_URL}/weeklyedition/"
@@ -13,6 +14,7 @@ VERSION = "0.85.1"
 
 INDEX_TEMPLATE = "index.html"
 ARTICLE_TEMPLATE = "article.html"
+STYLE_FILE = "style.css"
 
 user_agent = f"Digest/{VERSION}"
 verbose = False
@@ -38,21 +40,69 @@ SECTION_INFO = [
     {"title": "Obituary", "slug": "/obituary/"}
 ]
 
-SECTION_INFO = [{"title": "The Americas", "slug": "/the-americas/"}]
+#SECTION_INFO = [{"title": "The Americas", "slug": "/the-americas/"}]
 
 session = None
 
+dir_slug = None
 edition_date = None
+
+output_dir = None
 
 def main():
 
-    init_session()
+    global output_dir
+    output_dir = os.path.abspath(output_dir)
+    create_dir(output_dir)
 
+    init_session()
     sections = parse_sections()
+
+    output_dir = os.path.join(output_dir, dir_slug)
+  
+    create_dir(output_dir, True)
 
     sections = load_articles(sections)
 
     build_index(sections)
+    build_sections(sections)
+
+    shutil.copy2(
+        os.path.abspath(STYLE_FILE),
+        os.path.join(output_dir, STYLE_FILE)
+    )
+
+
+def create_dir(path, delete=False):
+    if os.path.exists(path):
+        if delete:
+            shutil.rmtree(path)
+        else:
+            return
+
+    os.makedirs(path)
+
+def build_sections(sections):
+    
+    template = load_template(ARTICLE_TEMPLATE)
+
+    for section in sections:
+        for article in section["articles"]:
+
+            content = article['content']
+            title=article['title']
+            output = template.format(content = content, title=title)
+        
+            write_file(article["dir"], article["file_name"], output)
+
+def write_file(dir, file_name, data):
+    section_dir = os.path.join(output_dir, dir)
+    create_dir(section_dir)
+
+    file_path = os.path.join(section_dir, file_name)
+    with open(file_path, 'w', encoding='utf-8') as file:
+        file.write(data)
+
 
 def load_articles(sections):
 
@@ -65,13 +115,14 @@ def load_articles(sections):
 
             doc = Document(article["text"])
             title = doc.title()
-            content = doc.summary()
+            content = doc.summary(html_partial=True)
 
             articles.append({
                 "title":title, 
                 "content":content,
                 "url":u,
-                "file_name":u.split('/')[-1]
+                "file_name": f"{u.split('/')[-1]}.html",
+                "dir": section['section']['slug'].strip('/')
             })
 
         section["articles"] = articles
@@ -82,23 +133,24 @@ def build_index(sections):
 
     output = ""
     for section in sections:
-        print(section)
+
         output += f"<h2>{section['section']['title']}</h2>\n"
 
-        output += "<div><ul>"
+        output += "<div><ul class='section-list'>"
         for article in section['articles']:
             #{url.split('/')[-1]}
             title = article["title"]
             file_name = article["file_name"]
-            dir = section['section']['slug'].strip('/')
-            output += f"<li><a href='{dir}/{file_name}.html'>{title}</a></li>\n"
+            dir = article["dir"]
+            output += f"<li><a href='{dir}/{file_name}'>{title}</a></li>\n"
 
         output += "</ul></div>\n"
 
     template = load_template(INDEX_TEMPLATE)
     
     output = template.format(content = output, title=edition_date)
-    print(output)
+
+    write_file(output_dir, "index.html", output)
 
 
 def parse_sections():
@@ -132,10 +184,14 @@ def parse_sections():
     return sections
 
 def extract_date_from_url(url):
+
+    global dir_slug
     # Use a regular expression to extract the date part from the URL
     match = re.search(r'/(\d{4}-\d{2}-\d{2})', url)
     if match:
         date_str = match.group(1)  # Extracted date string in the format YYYY-MM-DD
+
+        dir_slug = f"economist-{date_str}"
         # Convert the date string into a datetime object
         date_obj = datetime.strptime(date_str, '%Y-%m-%d')
         # Format the datetime object into the desired format
@@ -222,5 +278,6 @@ if __name__ == "__main__":
         user_agent = args.user_agent
 
     verbose = args.verbose
+    output_dir = args.output_dir
 
     main()

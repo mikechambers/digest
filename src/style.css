@@ -4,7 +4,7 @@ body {
     margin: 20px;
     max-width: 800px;
     margin: auto;
-    padding:20px;
+    padding: 20px;
     text-rendering: optimizeLegibility;
     color: #333333;
 }
@@ -19,11 +19,34 @@ p {
 }
 
 .section-list a {
-    color: inherit; /* Inherits the color from the parent element */
-    text-decoration: none; /* Removes the underline */
-    font: inherit; /* Inherits font properties from the parent element */
+    color: inherit;
+    /* Inherits the color from the parent element */
+    text-decoration: none;
+    /* Removes the underline */
+    font: inherit;
+    /* Inherits font properties from the parent element */
 }
 
 .section-list a:visited {
     color: #AAAAAA;
+}
+
+.header {
+    width: 100%;
+    display: flex;
+    font-size: small;
+}
+
+.footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: small;
+    gap: 60px;
+}
+
+.footer_right {
+    display: flex;
+    align-items: end;
+    text-align: right;
 }

@@ -87,44 +87,46 @@ def build_sections(sections):
     
     template = load_template(ARTICLE_TEMPLATE)
 
+    articles = []
     for section in sections:
-        articles = section["articles"]
-        num_articles = len(articles)
+        articles.extend(section["articles"])
 
-        for i in range(num_articles):
-            article = articles[i]
-            content = article['content']
-            title = article['title']
-            
-            # Get previous and next articles
-            prev_article = articles[i-1] if i > 0 else None
-            next_article = articles[i+1] if i < num_articles - 1 else None
-            
+    #articles = section["articles"]
+    num_articles = len(articles)
 
-            prev_title = "Index"
-            prev_url = "../index.html"
-            next_title = "Index"
-            next_url = "../index.html"
-
-            if prev_article:
-                prev_title = prev_article["title"]
-                prev_url = prev_article["file_name"]
-
-            if next_article:
-                next_title = next_article["title"]
-                next_url = next_article["file_name"]
-
-            # Add previous and next titles to the output
-            output = template.format(
-                content=content,
-                title=title,
-                prev_title=prev_title,
-                prev_url = prev_url,
-                next_title=next_title,
-                next_url = next_url
-            )
+    for i in range(num_articles):
+        article = articles[i]
+        content = article['content']
+        title = article['title']
         
-            write_file(article["dir"], article["file_name"], output)
+        # Get previous and next articles
+        prev_article = articles[i-1] if i > 0 else None
+        next_article = articles[i+1] if i < num_articles - 1 else None
+        
+        prev_title = "Index"
+        prev_url = "../index.html"
+        next_title = "Index"
+        next_url = "../index.html"
+
+        if prev_article:
+            prev_title = prev_article["title"]
+            prev_url = prev_article["file_name"]
+
+        if next_article:
+            next_title = next_article["title"]
+            next_url = next_article["file_name"]
+
+        # Add previous and next titles to the output
+        output = template.format(
+            content=content,
+            title=title,
+            prev_title=prev_title,
+            prev_url = prev_url,
+            next_title=next_title,
+            next_url = next_url
+        )
+    
+        write_file(article["dir"], article["file_name"], output)
 
 
 def build_sections2(sections):

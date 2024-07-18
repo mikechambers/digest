@@ -18,6 +18,7 @@ STYLE_FILE = "style.css"
 
 user_agent = f"Digest/{VERSION}"
 verbose = False
+cookie_source = "firefox"
 
 SECTION_INFO = [
     {"title": "The World This Week", "slug": "/the-world-this-week/"},
@@ -210,7 +211,8 @@ def load_url(url):
 
 def init_session():
     global session
-    cookies = browsercookie.firefox()
+
+    cookies = get_browser_cookies(cookie_source)
     session = requests.Session()
     session.cookies.update(cookies)
 
@@ -220,6 +222,19 @@ def init_session():
 
     session.headers.update(headers)
     
+def get_browser_cookies(browser_name):
+    if browser_name.lower() == 'chrome':
+        return browsercookie.chrome()
+    elif browser_name.lower() == 'firefox':
+        return browsercookie.firefox()
+    elif browser_name.lower() == 'edge':
+        return browsercookie.edge()
+    elif browser_name.lower() == 'opera':
+        return browsercookie.opera()
+    else:
+        raise ValueError("Unsupported --cookie-source name. Supported browsers: 'chrome', 'firefox', 'edge', 'opera'.")
+
+
 def load_template(template):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     
@@ -258,6 +273,14 @@ if __name__ == "__main__":
         required=False, 
         help="the user agent to use when retrieving pages from the Economist website"
     )
+
+        
+    parser.add_argument(
+        "--cookie-source",
+        dest="cookie_source",
+        required=False, 
+        help="The browser that cookies will be retried from for the Economist. Must be logged into the economist. Options are firefox (default), chrome, edge, opera."
+    )
     
     parser.add_argument(
         '--output-dir',
@@ -276,6 +299,9 @@ if __name__ == "__main__":
 
     if args.user_agent != None:
         user_agent = args.user_agent
+
+    if args.cookie_source != None:
+        cookie_source = args.cookie_source
 
     verbose = args.verbose
     output_dir = args.output_dir

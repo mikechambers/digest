@@ -110,11 +110,11 @@ def build_sections(sections):
 
         if prev_article:
             prev_title = prev_article["title"]
-            prev_url = prev_article["file_name"]
+            prev_url = f"../{prev_article["dir"]}/{prev_article["file_name"]}"
 
         if next_article:
             next_title = next_article["title"]
-            next_url = next_article["file_name"]
+            next_url = f"../{next_article["dir"]}/{next_article["file_name"]}"
 
         # Add previous and next titles to the output
         output = template.format(

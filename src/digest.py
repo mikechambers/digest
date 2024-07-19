@@ -1,3 +1,5 @@
+
+
 import argparse
 import sys
 import requests
@@ -66,6 +68,9 @@ def main():
 
     output_dir = os.path.join(output_dir, dir_slug)
   
+    if verbose:
+        print(f"Writing to {output_dir}")
+
     create_dir(output_dir, True)
 
     sections = load_articles(sections)
@@ -74,6 +79,8 @@ def main():
     build_sections(sections)
     build_podcast(sections)
 
+    if verbose:
+        print(f"Copying CSS file")
     shutil.copy2(
         os.path.abspath(STYLE_FILE),
         os.path.join(output_dir, STYLE_FILE)
@@ -90,6 +97,10 @@ def create_dir(path, delete=False):
     os.makedirs(path)
 
 def build_podcast(sections):
+
+    if verbose:
+        print(f"Generating podcast file")
+
     item_template = load_template(PODCAST_ITEM_TEMPLATE)
 
     second = 59
@@ -121,25 +132,31 @@ def build_podcast(sections):
 
     template = load_template(PODCAST_TEMPLATE)
 
-    
+    if verbose:
+        print(f"Found {len(items)} mp3s")
+
     output = template.format(
         edition_date = edition_date,
         build_date = build_date,
         items = "\n".join(items)
     )
 
+    if verbose:
+        print(f"Saving podcast file")
     write_file(output_dir, PODCAST_TEMPLATE, output)
 
 
 def build_sections(sections):
     
+    if verbose:
+        print(f"Generating article files")
+
     template = load_template(ARTICLE_TEMPLATE)
 
     articles = []
     for section in sections:
         articles.extend(section["articles"])
 
-    #articles = section["articles"]
     num_articles = len(articles)
 
     for i in range(num_articles):
@@ -181,29 +198,24 @@ def build_sections(sections):
         write_file(article["dir"], article["file_name"], output)
 
 
-def build_sections2(sections):
-    
-    template = load_template(ARTICLE_TEMPLATE)
-
-    for section in sections:
-        for article in section["articles"]:
-
-            content = article['content']
-            title=article['title']
-            output = template.format(content = content, title=title)
-        
-            write_file(article["dir"], article["file_name"], output)
-
 def write_file(dir, file_name, data):
+
     section_dir = os.path.join(output_dir, dir)
     create_dir(section_dir)
 
     file_path = os.path.join(section_dir, file_name)
+
+    if verbose:
+        print(f"Writing file to : {file_path}")
+
     with open(file_path, 'w', encoding='utf-8') as file:
         file.write(data)
 
 
 def load_articles(sections):
+
+    if verbose:
+        print(f"Retrieving articles")
 
     for section in sections:
         articles = []
@@ -240,6 +252,9 @@ def load_articles(sections):
 
 def build_index(sections):
 
+    if verbose:
+        print(f"Generating index")
+
     output = ""
     for section in sections:
 
@@ -266,6 +281,10 @@ def build_index(sections):
     write_file(output_dir, "index.html", output)
 
 def parse_sections():
+
+    if verbose:
+        print(f"Retrieving weekly edition")
+
     global edition_date
     global weekly_url
 
@@ -286,6 +305,7 @@ def parse_sections():
 
     sections = []
 
+    article_count = 0
     for section in SECTION_INFO:
         pattern = fr'href="({section['slug']}[^\"]+)"'
         found_urls = re.findall(pattern, weekly["text"])
@@ -294,7 +314,11 @@ def parse_sections():
         #found_urls = list(set(found_urls))
         found_urls = remove_duplicate_strings(found_urls)
 
+        article_count += len(found_urls)
         sections.append({"section": section, "urls":found_urls})
+
+    if verbose:
+        print(f"Found {article_count} articles in {len(sections)} sections")
 
     return sections
 
@@ -326,17 +350,26 @@ def extract_date_from_url(url):
         None
 
 def load_url(url):
+
+    if verbose:
+        print(f"Retrieving URL {url}")
+
     response = session.get(url)
 
-    if response.status_code == 200:
+    code = response.status_code
+    if code == 200:
         return {"text":response.text, "url":response.url}
     else:
-        return None
+        raise Exception(f"Non 200 Status code returned ({code}) : {url}")
 
 def init_session():
     global session
 
     cookies = get_browser_cookies(cookie_source)
+
+    if verbose:
+        print(f"Using cookies from {cookie_source}")
+
     session = requests.Session()
     session.cookies.update(cookies)
 
@@ -344,9 +377,13 @@ def init_session():
         'User-Agent': user_agent
     }
 
+    if verbose:
+        print(f"Making requests with User Agent : {user_agent}")
+
     session.headers.update(headers)
     
 def get_browser_cookies(browser_name):
+
     if browser_name.lower() == 'chrome':
         return browsercookie.chrome()
     elif browser_name.lower() == 'firefox':
@@ -364,6 +401,9 @@ def load_template(template):
     
     # Construct the full path to the file relative to the script
     file_path = os.path.join(script_dir, template)
+
+    if verbose:
+        print(f"Loading template {file_path}")
 
     with open(file_path, 'r', encoding='utf-8') as file:
         file_content = file.read()
@@ -398,7 +438,6 @@ if __name__ == "__main__":
         help="the user agent to use when retrieving pages from the Economist website"
     )
 
-        
     parser.add_argument(
         "--cookie-source",
         dest="cookie_source",
@@ -430,4 +469,11 @@ if __name__ == "__main__":
     verbose = args.verbose
     output_dir = args.output_dir
 
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"An error occurred. Aborting : {e}")
+        if verbose:
+            import traceback
+            traceback.print_exc()
+        sys.exit(1)

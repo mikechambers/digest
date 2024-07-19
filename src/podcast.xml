@@ -7,7 +7,7 @@
     <atom:link href="podcast.xml" rel="self" type="application/rss+xml"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <description><![CDATA[<p>Economist Digest {edition_date}</p>]]></description>
-    <generator>RSS.com v2.14.1</generator>
+    <generator>https://github.com/mikechambers/digest</generator>
     <lastBuildDate>{build_date}</lastBuildDate>
     <language>en</language>
     <copyright><![CDATA[]]></copyright>

@@ -52,6 +52,20 @@ You can find a complete list of options by running:
 python3 digest.py --help
 ```
 
+## Using the Generated Podcast feed
+
+An XML file will be generated that creates a podcast from the mp3 files for the current weekly edition. It is generated in serial mode with the order of the episodes based on the order of the articles online.
+
+This file can be used to create a podcast to listen through the weekly edition, as well as sync all of the files offline to listen when you don't have network coverage.
+
+Each podcast / URL represents a single weekly edition, and you will need to generate and add a new url for new editions.
+
+You can find info on how to add the URL to Apple podcast [here](https://podcasters.apple.com/support/828-test-your-podcast)
+
+Note that the mp3 files are not downloaded by the script, but rather they are linked to their online location.
+
+Also, in order to add the URL to your podcasting app, you may need to host it online when you add it.
+
 ## Known Issues
 
 The weekly cartoon does not currently display.

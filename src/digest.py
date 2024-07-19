@@ -224,11 +224,21 @@ def parse_sections():
         found_urls = re.findall(pattern, weekly["text"])
 
         #remove duplicates
-        found_urls = list(set(found_urls))
+        #found_urls = list(set(found_urls))
+        found_urls = remove_duplicate_strings(found_urls)
 
         sections.append({"section": section, "urls":found_urls})
 
     return sections
+
+def remove_duplicate_strings(items):
+    seen = set()
+    unique_items = []
+    for item in items:
+        if item not in seen:
+            seen.add(item)
+            unique_items.append(item)
+    return unique_items
 
 def extract_date_from_url(url):
 

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://media.rss.com/style.xsl"?>
+<rss xmlns:podcast="https://podcastindex.org/namespace/1.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" xml:lang="en" version="2.0">
+  <channel>
+    <title><![CDATA[Economist Digest {edition_date}]]></title>
+    <link>https://foo.com/podcasts/digest</link>
+    <atom:link href="podcast.xml" rel="self" type="application/rss+xml"/>
+    <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
+    <description><![CDATA[<p>Economist Digest {edition_date}</p>]]></description>
+    <generator>RSS.com v2.14.1</generator>
+    <lastBuildDate>{build_date}</lastBuildDate>
+    <language>en</language>
+    <copyright><![CDATA[]]></copyright>
+    <itunes:image href="https://assets.rss.com/images/no-cover-1400.jpg"/>
+    <podcast:guid>75bcfb0b-9be5-595a-9780-aba153965deb</podcast:guid>
+    <image>
+      <url>https://assets.rss.com/images/no-cover-1400.jpg</url>
+      <title>Economist Digest</title>
+      <link>https://rss.com/podcasts/foobar2325</link>
+    </image>
+    <podcast:locked>yes</podcast:locked>
+    <podcast:license>Mike C</podcast:license>
+    <itunes:author>m</itunes:author>
+    <itunes:owner>
+      <itunes:name>m</itunes:name>
+    </itunes:owner>
+    <itunes:explicit>false</itunes:explicit>
+    <itunes:type>episodic</itunes:type>
+    <itunes:category text="News"/>
+    {items}
+  </channel>
+</rss>

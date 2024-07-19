@@ -7,6 +7,7 @@ import re
 import os
 from datetime import datetime
 import shutil
+from datetime import datetime, timezone
 
 BASE_URL = "https://www.economist.com"
 WEEKLY_URL = f"{BASE_URL}/weeklyedition/"
@@ -14,6 +15,9 @@ VERSION = "0.85.1"
 
 INDEX_TEMPLATE = "index.html"
 ARTICLE_TEMPLATE = "article.html"
+PODCAST_TEMPLATE = "podcast.xml"
+PODCAST_ITEM_TEMPLATE = "item.xml"
+
 STYLE_FILE = "style.css"
 
 user_agent = f"Digest/{VERSION}"
@@ -67,6 +71,7 @@ def main():
 
     build_index(sections)
     build_sections(sections)
+    build_podcast(sections)
 
     shutil.copy2(
         os.path.abspath(STYLE_FILE),
@@ -82,6 +87,48 @@ def create_dir(path, delete=False):
             return
 
     os.makedirs(path)
+
+def build_podcast(sections):
+    item_template = load_template(PODCAST_ITEM_TEMPLATE)
+
+    second = 59
+    minute = 59
+    now = datetime.now(timezone.utc)
+
+    items = []
+    for section in sections:
+        for article in section["articles"]:
+            title = article["title"]
+            mp3 = article["mp3"]
+
+            now = now.replace(minute = minute, second=second, microsecond=0)
+            build_date = now.strftime('%a, %d %b %Y %H:%M:%S GMT')
+            second -= 1
+
+            if second < 1:
+                second = 59
+                minute -= 1
+
+            items.append(
+                item_template.format(
+                    title = title,
+                    mp3 = mp3,
+                    build_date = build_date
+                )
+            )
+
+
+    template = load_template(PODCAST_TEMPLATE)
+
+    
+    output = template.format(
+        edition_date = edition_date,
+        build_date = build_date,
+        items = "\n".join(items)
+    )
+
+    write_file(output_dir, PODCAST_TEMPLATE, output)
+
 
 def build_sections(sections):
     
@@ -162,6 +209,15 @@ def load_articles(sections):
             article = load_url(u)
 
             doc = Document(article["text"])
+
+            #extract mp3
+            pattern = r'https:\/\/[^\s]*\.mp3'
+            matches = re.findall(pattern, article["text"])
+
+            mp3 = None
+            if matches:
+                mp3 = matches[0]
+
             title = doc.title()
             content = doc.summary(html_partial=True)
 
@@ -170,7 +226,8 @@ def load_articles(sections):
                 "content":content,
                 "url":u,
                 "file_name": f"{u.split('/')[-1]}.html",
-                "dir": section['section']['slug'].strip('/')
+                "dir": section['section']['slug'].strip('/'),
+                "mp3":mp3
             })
 
         section["articles"] = articles
@@ -255,7 +312,7 @@ def extract_date_from_url(url):
     if match:
         date_str = match.group(1)  # Extracted date string in the format YYYY-MM-DD
 
-        dir_slug = f"economist-{date_str}"
+        dir_slug = f"{date_str}"
         # Convert the date string into a datetime object
         date_obj = datetime.strptime(date_str, '%Y-%m-%d')
         # Format the datetime object into the desired format

@@ -27,17 +27,19 @@ p {
     /* Inherits font properties from the parent element */
 }
 
+figure {
+    margin:0px;
+}
+
+.ed4dtdz0 {
+    display: none;
+}
+
 .section-list a:visited {
     color: #AAAAAA;
 }
 
-.header {
-    width: 100%;
-    display: flex;
-    font-size: small;
-}
-
-.footer {
+.footer, .header {
     width: 100%;
     display: flex;
     justify-content: space-between;

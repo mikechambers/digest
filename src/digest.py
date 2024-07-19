@@ -47,8 +47,8 @@ session = None
 
 dir_slug = None
 edition_date = None
-
 output_dir = None
+weekly_url = None
 
 def main():
 
@@ -123,7 +123,8 @@ def build_sections(sections):
             prev_title=prev_title,
             prev_url = prev_url,
             next_title=next_title,
-            next_url = next_url
+            next_url = next_url,
+            economist_url = article["url"]
         )
     
         write_file(article["dir"], article["file_name"], output)
@@ -195,17 +196,22 @@ def build_index(sections):
 
     template = load_template(INDEX_TEMPLATE)
     
-    output = template.format(content = output, title=edition_date)
+    output = template.format(
+        content = output,
+        title=edition_date,
+        weekly_url = weekly_url
+    )
 
     write_file(output_dir, "index.html", output)
 
-
 def parse_sections():
     global edition_date
+    global weekly_url
 
     weekly = load_url(WEEKLY_URL)
 
-    weekly_date = extract_date_from_url(weekly["url"])
+    weekly_url = weekly["url"]
+    weekly_date = extract_date_from_url(weekly_url)
 
     if weekly_date is None:
         edition_date = "Weekly Edition"
@@ -239,6 +245,7 @@ def remove_duplicate_strings(items):
             seen.add(item)
             unique_items.append(item)
     return unique_items
+
 
 def extract_date_from_url(url):
 

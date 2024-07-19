@@ -5,12 +5,11 @@ Digest is a Python3 script that creates a local version of the weekly Economist 
 Specifically, it:
 
 * Creates a local archive of the weekly edition
-* Fonts an layout optimized for reading
+* Provides an optimized reading experience
 * Easy navigation between sections and articles
 * Ability to read offline
-* Ability to easy jump to article on Economist website
-* Read in browser without losing place due to browser unloading from memory
-* Generate Podcast XML file for weekly edition, to allow listening to edition in podcast app, which among other things allows you to sync entire audio edition offline
+* Ability to easy jump to articles on Economist website
+* Ability to listen to edition as a podcast, online or off
 
 The project was built to work around performance issues and limitation of the Economist website and mobile application. 
 
@@ -40,6 +39,12 @@ Before running the script, you must log into economist.com with an account that 
 The default browser used is firefox.
 
 This is used to set the cookies that authenticate your account.
+
+You can find a complete list of options by running:
+
+```bash
+python3 digest.py --help
+```
 
 To generate the digest:
 

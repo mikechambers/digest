@@ -472,7 +472,7 @@ if __name__ == "__main__":
         "--cookie-source",
         dest="cookie_source",
         required=False, 
-        help="The browser that cookies will be retried from for the Economist. Must be logged into the economist. Options are firefox (default), chrome, edge, opera."
+        help="The browser that cookies will be retrieved from for the Economist. Must be logged into economist.com and have access to digital edition. Options are firefox (default), chrome, edge, opera."
     )
     
     parser.add_argument(
@@ -480,7 +480,7 @@ if __name__ == "__main__":
         type=str,
         dest="output_dir",
         required=True, 
-        help='The path to the directory'
+        help='The path to the directory that the digest will be created'
     )
 
     args = parser.parse_args()

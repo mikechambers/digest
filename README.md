@@ -52,8 +52,7 @@ To generate the digest:
 python3 digest.py --output-dir ~/tmp/economist/ --cookie-source chrome
 ```
 
-This will then generate a folder in the form of **YYYY-MM-DD** in the specified output directory. The folder will content contain an *index.html* file which can be loaded into a browser to access all of the content.
-
+This will generate a folder in the form of **YYYY-MM-DD** in the specified output directory. The folder will contain an *index.html* file which can be loaded into a browser to access all of the content.
 
 ## Questions, Feature Requests, Feedback
 

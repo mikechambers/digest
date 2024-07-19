@@ -15,6 +15,21 @@ The project was built to work around performance issues and limitation of the Ec
 
 This project requires that you have access to the digital version of the Economist, and is not affiliated with or supported by The Economist.
 
+
+## Images
+
+### Desktop Browser
+<img src="images/desktop_1.png" width="300"> <img src="images/desktop_2.png" width="300">
+
+### Mobile Browser
+
+<img src="images/mobile_1.jpg" height="300"> <img src="images/mobile_2.jpg" height="300">
+
+### Mobile Podcast
+
+<img src="images/podcast_1.jpg" height="300"> <img src="images/podcast_2.jpg" height="300">
+
+
 ## Installation
 
 The script requires Python3 and the following libraries to be installed.

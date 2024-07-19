@@ -7,6 +7,7 @@
       <guid isPermaLink="false">793d556c-5e46-4f15-ad8a-0551e8304dac</guid>
       <itunes:duration>411</itunes:duration>
       <itunes:episodeType>full</itunes:episodeType>
+      <itunes:episode>{index}</itunes:episode>
       <itunes:explicit>false</itunes:explicit>
       <pubDate>{build_date}</pubDate>
     </item>

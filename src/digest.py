@@ -130,6 +130,7 @@ def build_podcast(sections):
     now = datetime.now(timezone.utc)
 
     items = []
+    index = 1
     for section in sections:
         for article in section["articles"]:
             title = article["title"]
@@ -147,10 +148,12 @@ def build_podcast(sections):
                 item_template.format(
                     title = title,
                     mp3 = mp3,
-                    build_date = build_date
+                    build_date = build_date,
+                    index = index
                 )
             )
 
+            index += 1
 
     template = load_template(PODCAST_TEMPLATE)
 

@@ -36,9 +36,15 @@ Before running the script, you must log into economist.com with an account that 
 * Microsoft Edge (edge)
 * Opera (opera)
 
-The default browser used is firefox.
+and make sure to pass to the script like so:
 
-This is used to set the cookies that authenticate your account.
+```bash
+python3 digest.py --output-dir ~/tmp/economist/ --cookie-source chrome
+```
+
+This is necessary to set the cookies for the script that will authenticate your account.
+
+This will generate a folder in the form of **YYYY-MM-DD** in the specified output directory. The folder will contain an *index.html* file which can be loaded into a browser to access all of the content.
 
 You can find a complete list of options by running:
 
@@ -46,13 +52,9 @@ You can find a complete list of options by running:
 python3 digest.py --help
 ```
 
-To generate the digest:
+## Known Issues
 
-```bash
-python3 digest.py --output-dir ~/tmp/economist/ --cookie-source chrome
-```
-
-This will generate a folder in the form of **YYYY-MM-DD** in the specified output directory. The folder will contain an *index.html* file which can be loaded into a browser to access all of the content.
+The weekly cartoon does not currently display.
 
 ## Questions, Feature Requests, Feedback
 

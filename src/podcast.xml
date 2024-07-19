@@ -12,7 +12,7 @@
     <language>en</language>
     <copyright><![CDATA[]]></copyright>
     <itunes:image href="https://assets.rss.com/images/no-cover-1400.jpg"/>
-    <podcast:guid>75bcfb0b-9be5-595a-9780-aba153965deb</podcast:guid>
+    <podcast:guid>{uuid}</podcast:guid>
     <image>
       <url>https://assets.rss.com/images/no-cover-1400.jpg</url>
       <title>Economist Digest</title>

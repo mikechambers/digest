@@ -31,6 +31,7 @@ from datetime import datetime
 import shutil
 from datetime import datetime, timezone
 import readtime
+import uuid
 
 BASE_URL = "https://www.economist.com"
 WEEKLY_URL = f"{BASE_URL}/weeklyedition/"
@@ -149,7 +150,7 @@ def build_podcast(sections):
                     title = title,
                     mp3 = mp3,
                     build_date = build_date,
-                    index = index
+                    index = index,
                 )
             )
 
@@ -160,9 +161,12 @@ def build_podcast(sections):
     if verbose:
         print(f"Found {len(items)} mp3s")
 
+
+    id = uuid.uuid4()
     output = template.format(
         edition_date = edition_date,
         build_date = build_date,
+        uuid = id,
         items = "\n".join(items)
     )
 

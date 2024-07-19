@@ -1,6 +1,10 @@
 body {
     font-family: -apple-system, Arial, sans-serif;
-    line-height: 1.6;
+    font-size: 18px;
+    line-height: 29px;
+
+
+    /*line-height: 1.6;*/
     margin: 20px;
     max-width: 800px;
     margin: auto;
@@ -10,9 +14,28 @@ body {
 }
 
 h1 {
+    font-size: 1.25em;
+}
+
+h2 {
+    font-size: 1.125em;
+}
+
+h3 {
+    font-size: 1.05em;
+}
+
+h4, h5, h6 {
+    font-size: 1em;
+    margin: 1em 0;
+}
+
+/*
+h6 {
     font-size: 2em;
     margin-bottom: 20px;
 }
+*/
 
 p {
     margin-bottom: 20px;

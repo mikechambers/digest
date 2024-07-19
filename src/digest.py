@@ -1,4 +1,24 @@
-
+# Copyright (c) 2024 Mike Chambers
+# https://github.com/mikechambers/dispatch
+#
+# MIT License
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+# of the Software, and to permit persons to whom the Software is furnished to do
+# so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import argparse
 import sys
@@ -56,6 +76,8 @@ dir_slug = None
 edition_date = None
 output_dir = None
 weekly_url = None
+
+reading_rate = 250
 
 def main():
 
@@ -181,7 +203,7 @@ def build_sections(sections):
             next_title = next_article["title"]
             next_url = f"../{next_article["dir"]}/{next_article["file_name"]}"
 
-        read_time = readtime.of_html(content, wpm=250)
+        read_time = readtime.of_html(content, wpm=reading_rate)
 
         # Add previous and next titles to the output
         output = template.format(
@@ -439,6 +461,14 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        "--reading-rate",
+        dest="reading_rate",
+        required=False,
+        type=int,
+        help=f"Words per minute read to determine reading length for articles. Default {reading_rate}"
+    )
+
+    parser.add_argument(
         "--cookie-source",
         dest="cookie_source",
         required=False, 
@@ -460,11 +490,14 @@ if __name__ == "__main__":
         print("https://github.com/mikechambers/dispatch")
         sys.exit()
 
-    if args.user_agent != None:
+    if args.user_agent:
         user_agent = args.user_agent
 
-    if args.cookie_source != None:
+    if args.cookie_source:
         cookie_source = args.cookie_source
+
+    if args.reading_rate:
+        reading_rate = args.reading_rate
 
     verbose = args.verbose
     output_dir = args.output_dir

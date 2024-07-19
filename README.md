@@ -8,6 +8,7 @@ pip install requests
 pip install browsercookie
 pip install readability-lxml
 pip install lxml_html_clean
+pip install readtime
 ```
 
 ## Todo

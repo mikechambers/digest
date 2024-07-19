@@ -8,6 +8,7 @@ import os
 from datetime import datetime
 import shutil
 from datetime import datetime, timezone
+import readtime
 
 BASE_URL = "https://www.economist.com"
 WEEKLY_URL = f"{BASE_URL}/weeklyedition/"
@@ -163,6 +164,8 @@ def build_sections(sections):
             next_title = next_article["title"]
             next_url = f"../{next_article["dir"]}/{next_article["file_name"]}"
 
+        read_time = readtime.of_html(content, wpm=250)
+
         # Add previous and next titles to the output
         output = template.format(
             content=content,
@@ -171,7 +174,8 @@ def build_sections(sections):
             prev_url = prev_url,
             next_title=next_title,
             next_url = next_url,
-            economist_url = article["url"]
+            economist_url = article["url"],
+            read_time = read_time
         )
     
         write_file(article["dir"], article["file_name"], output)

@@ -55,6 +55,7 @@ SECTION_INFO = [
     {"title": "Briefing", "slug": "/briefing/"},
     {"title": "United States", "slug": "/united-states/"},
     {"title": "The Americas", "slug": "/the-americas/"},
+    {"title": "Asia", "slug": "/asia/"},
     {"title": "China", "slug": "/china/"},
     {"title": "Middle East and Africa", "slug": "/middle-east-and-africa/"},
     {"title": "Europe", "slug": "/europe/"},
@@ -486,14 +487,16 @@ if __name__ == "__main__":
         '--output-dir',
         type=str,
         dest="output_dir",
-        required=True, 
         help='The path to the directory that the digest will be created'
     )
 
     args = parser.parse_args()
 
+    if not args.version and not args.output_dir:
+        parser.error('--output-dir is required unless --version is specified')
+
     if args.version:
-        print(f"Dispatch version : {VERSION}")
+        print(f"Digest version : {VERSION}")
         print("https://github.com/mikechambers/dispatch")
         sys.exit()
 

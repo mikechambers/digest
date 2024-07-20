@@ -516,7 +516,6 @@ if __name__ == "__main__":
         main()
     except Exception as e:
         print(f"An error occurred. Aborting : {e}")
-        if verbose:
-            import traceback
-            traceback.print_exc()
+        import traceback
+        traceback.print_exc()
         sys.exit(1)

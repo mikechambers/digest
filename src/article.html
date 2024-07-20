@@ -6,15 +6,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
     <link rel="stylesheet" type="text/css" href="../style.css">
+
+    <script defer>
+        function updateScrollPercentage() {{
+            var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+            var clientHeight = document.documentElement.clientHeight || window.innerHeight;
+            var scrollPercent = Math.round((scrollTop / (scrollHeight - clientHeight)) * 100);
+
+            document.documentElement.style.setProperty('--scroll-percentage', scrollPercent + '%');
+        }}
+
+        window.addEventListener('scroll', updateScrollPercentage);
+        window.addEventListener('resize', updateScrollPercentage);
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', updateScrollPercentage);
+    </script>
 </head>
 
 <body>
 
-    <div class="header">
-        <div><a href="../index.html">Index</a></div>
-        <div><a href="{economist_url}">Read on Economist.com</a></div>
+    <div class="top">
+        <div id="progress_container">
+            <div id="progress_bar"></div>
+        </div>
+        <div class="header">
+            <div><a href="../index.html">Index</a></div>
+            <div><a href="{economist_url}">Read on Economist.com</a></div>
+        </div>
     </div>
-
+    <div id="top_spacer">&nbsp;</div>
 
     <h1>{title}</h1>
     <p><b class="read_time">{read_time}</b></p>

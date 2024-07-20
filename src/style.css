@@ -1,11 +1,13 @@
+:root {
+    --scroll-percentage: 0%;
+}
+
 body {
     font-family: -apple-system, Arial, sans-serif;
     font-size: 18px;
     line-height: 29px;
 
-
     /*line-height: 1.6;*/
-    margin: 20px;
     max-width: 800px;
     margin: auto;
     padding: 20px;
@@ -60,6 +62,32 @@ figure {
 
 .section-list a:visited {
     color: #AAAAAA;
+}
+
+#top_spacer{
+    height: 20px;
+}
+
+.top {
+    position: fixed;
+    top: 0;
+    background-color: white;
+    width:100%;
+    max-width: 800px;
+    margin: auto;
+    padding-top: 2px;
+}
+
+#progress_bar {
+    width:var(--scroll-percentage);
+    height:100%;
+    background-color: #a0a0a0;
+}
+
+#progress_container {
+    width: 100%;
+    height: 5px;
+    background-color: #e0e0e0;
 }
 
 .footer, .header {

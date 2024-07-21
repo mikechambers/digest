@@ -296,6 +296,9 @@ def build_index(sections):
     output = ""
     for section in sections:
 
+        if not section['articles']:
+            continue
+
         output += f"<h2>{section['section']['title']}</h2>\n"
 
         output += "<div><ul class='section-list'>"

@@ -35,11 +35,7 @@ This project requires that you have access to the digital version of the Economi
 The script requires Python3 and the following libraries to be installed.
 
 ```bash
-pip install requests
-pip install browsercookie
-pip install readability-lxml
-pip install lxml_html_clean
-pip install readtime
+pip install -r requirements.txt
 ```
 
 ## Usage
@@ -83,7 +79,8 @@ Also, in order to add the URL to your podcasting app, you may need to host it on
 
 ## Known Issues
 
-The weekly cartoon does not currently display.
+* The weekly cartoon does not currently display.
+* There's no support for Brave browser yet.
 
 ## Questions, Feature Requests, Feedback
 

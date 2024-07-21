@@ -136,7 +136,7 @@ def build_podcast(sections):
     for section in sections:
         for article in section["articles"]:
             title = f"{section["section"]["title"]} : {article["title"]}"
-            print(title)
+        
             mp3 = article["mp3"]
             url = article["url"]
 
@@ -186,31 +186,35 @@ def build_sections(sections):
 
     template = load_template(ARTICLE_TEMPLATE)
 
-    articles = []
+    items = []
+
     for section in sections:
-        articles.extend(section["articles"])
+        for article in section["articles"]:
+            items.append({"article":article, "section":section})
 
-    num_articles = len(articles)
-
+    num_articles = len(items)
     for i in range(num_articles):
-        article = articles[i]
+        article = items[i]["article"]
+        section = items[i]["section"]
         content = article['content']
         title = article['title']
-        
-        # Get previous and next articles
-        prev_article = articles[i-1] if i > 0 else None
-        next_article = articles[i+1] if i < num_articles - 1 else None
         
         prev_title = "Index"
         prev_url = "../index.html"
         next_title = "Index"
         next_url = "../index.html"
 
+        # Get previous and next articles
+        prev_article = items[i-1]["article"] if i > 0 else None
+        next_article = items[i+1]["article"] if i < num_articles - 1 else None
+
         if prev_article:
+            #prev_article = prev_article["article"]
             prev_title = prev_article["title"]
             prev_url = f"../{prev_article["dir"]}/{prev_article["file_name"]}"
 
         if next_article:
+            #next_article = next_article["article"]
             next_title = next_article["title"]
             next_url = f"../{next_article["dir"]}/{next_article["file_name"]}"
 
@@ -219,6 +223,7 @@ def build_sections(sections):
         # Add previous and next titles to the output
         output = template.format(
             content=content,
+            section_title = section["section"]["title"],
             title=title,
             prev_title=prev_title,
             prev_url = prev_url,

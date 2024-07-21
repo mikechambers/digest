@@ -44,12 +44,12 @@ h4, h5, h6 {
     margin: 1em 0;
 }
 
-/*
+
 h6 {
-    font-size: 2em;
-    margin-bottom: 20px;
+    font-size: 0.8em;
+    /*margin-bottom: 20px;*/
 }
-*/
+
 
 p {
     margin-bottom: 20px;
@@ -86,6 +86,10 @@ figure {
 
 #top_spacer{
     height: 20px;
+}
+
+.section_title {
+    color: #b30000;
 }
 
 .top {

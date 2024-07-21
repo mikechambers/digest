@@ -1,6 +1,7 @@
 :root {
     --scroll-percentage: 0%;
     --color-background : white;
+    --max-width:800px;
 }
 
 body {
@@ -9,7 +10,7 @@ body {
     line-height: 29px;
 
     /*line-height: 1.6;*/
-    max-width: 800px;
+    max-width: var(--max-width);
     margin: auto;
     padding: 20px;
     text-rendering: optimizeLegibility;
@@ -92,6 +93,7 @@ figure {
     top: 0;
     background-color: var(--color-background);
     width:90%;
+    max-width: var(--max-width);
     padding-top: 2px;
 }
 

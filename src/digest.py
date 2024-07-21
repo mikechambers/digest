@@ -135,8 +135,10 @@ def build_podcast(sections):
     index = 1
     for section in sections:
         for article in section["articles"]:
-            title = article["title"]
+            title = f"{section["section"]["title"]} : {article["title"]}"
+            print(title)
             mp3 = article["mp3"]
+            url = article["url"]
 
             now = now.replace(minute = minute, second=second, microsecond=0)
             build_date = now.strftime('%a, %d %b %Y %H:%M:%S GMT')
@@ -152,6 +154,7 @@ def build_podcast(sections):
                     mp3 = mp3,
                     build_date = build_date,
                     index = index,
+                    url = url
                 )
             )
 

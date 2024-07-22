@@ -1,0 +1,5 @@
+requests
+browsercookie
+readability-lxml
+lxml_html_clean
+readtime

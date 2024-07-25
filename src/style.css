@@ -55,6 +55,10 @@ p {
     margin-bottom: 20px;
 }
 
+#kal_image {
+    max-width: var(--max-width);
+}
+
 figcaption:not([class]) {
     display: none;
 }

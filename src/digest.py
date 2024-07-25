@@ -51,6 +51,7 @@ cookie_source = "firefox"
 SECTION_INFO = [
     {"title": "The World This Week", "slug": "/the-world-this-week/"},
     {"title": "Leaders", "slug": "/leaders/"},
+    {"title": "Letters", "slug": "/letters/"},
     {"title": "By Invitation", "slug": "/by-invitation/"},
     {"title": "Briefing", "slug": "/briefing/"},
     {"title": "United States", "slug": "/united-states/"},
@@ -249,7 +250,6 @@ def write_file(dir, file_name, data):
     with open(file_path, 'w', encoding='utf-8') as file:
         file.write(data)
 
-
 def load_articles(sections):
 
     if verbose:
@@ -262,7 +262,7 @@ def load_articles(sections):
             
             article = load_url(u)
 
-            doc = Document(article["text"])
+            doc = Document(input = article["text"])
 
             #extract mp3
             pattern = r'https:\/\/[^\s]*\.mp3'
@@ -274,6 +274,13 @@ def load_articles(sections):
 
             title = doc.title()
             content = doc.summary(html_partial=True)
+
+            if u.endswith("kals-cartoon"):
+                kal_pattern = r'https:\/\/www\.economist\.com\/cdn-cgi\/image\/width=\d{4},quality=\d{2},format=auto\/content-assets\/images\/\d{8}_WWD\d{3}\.png'
+                kal_matches = re.findall(kal_pattern, article["text"])
+
+                if kal_matches:
+                    content = f"<div><img src='{kal_matches[0]}' id='kal_image' /></div>"
 
             articles.append({
                 "title":title, 

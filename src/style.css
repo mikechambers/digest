@@ -59,6 +59,11 @@ p {
     max-width: var(--max-width);
 }
 
+#cover_image {
+    max-width: 40%;
+    padding: 4px;
+}
+
 figcaption:not([class]) {
     display: none;
 }

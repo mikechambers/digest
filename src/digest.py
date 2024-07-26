@@ -275,12 +275,7 @@ def load_articles(sections):
             title = doc.title()
             content = doc.summary(html_partial=True)
 
-            if u.endswith("kals-cartoon"):
-                kal_pattern = r'https:\/\/www\.economist\.com\/cdn-cgi\/image\/width=\d{4},quality=\d{2},format=auto\/content-assets\/images\/\d{8}_WWD\d{3}\.png'
-                kal_matches = re.findall(kal_pattern, article["text"])
-
-                if kal_matches:
-                    content = f"<div><img src='{kal_matches[0]}' id='kal_image' /></div>"
+            content = fix_content(content, article["text"], u)
 
             articles.append({
                 "title":title, 
@@ -294,6 +289,28 @@ def load_articles(sections):
         section["articles"] = articles
 
     return sections
+
+def fix_content(content, raw, url):
+    if url.endswith("kals-cartoon"):
+        kal_pattern = r'https:\/\/www\.economist\.com\/cdn-cgi\/image\/width=\d{4},quality=\d{2},format=auto\/content-assets\/images\/\d{8}_WWD\d{3}\.png'
+        kal_matches = re.findall(kal_pattern, raw)
+
+        if kal_matches:
+            content = f"<div><img src='{kal_matches[0]}' id='kal_image' /></div>"
+
+    elif url.endswith("this-weeks-covers"):
+        cover_pattern = r'https:\/\/www\.economist\.com\/cdn-cgi\/image\/width=\d{4},quality=\d{2},format=auto\/content-assets\/images\/\d{8}_[A-Z]{2}_[A-Z]{2}\.jpg(?=")'
+
+        cover_matches = re.findall(cover_pattern, raw)
+
+        tmp = ""
+        for m in cover_matches:
+            tmp += f"<img src='{m}' id='cover_image' />"
+        
+        if cover_matches:
+            content = f"<div>{tmp}</div>{content}"
+
+    return content
 
 def build_index(sections):
 

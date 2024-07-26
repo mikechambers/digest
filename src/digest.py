@@ -310,6 +310,18 @@ def fix_content(content, raw, url):
         if cover_matches:
             content = f"<div>{tmp}</div>{content}"
 
+    elif url.endswith("economic-data-commodities-and-markets"):
+        pattern = r'https:\/\/www\.economist\.com\/cdn-cgi\/image\/width=\d{4},quality=\d{2},format=auto\/content-assets\/images\/\d{8}_INT\d{3}\.png(?=")'
+        
+        matches = re.findall(pattern, raw)
+
+        tmp = ""
+        for m in matches:
+            tmp += f"<div><img src='{m}' id='data_image' /></div>"
+        
+        if matches:
+            content = f"<div>{tmp}</div>"
+
     return content
 
 def build_index(sections):

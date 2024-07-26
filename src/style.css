@@ -59,6 +59,11 @@ p {
     max-width: var(--max-width);
 }
 
+#data_image {
+    max-width: 80%;
+    padding: 4px;
+}
+
 #cover_image {
     max-width: 40%;
     padding: 4px;

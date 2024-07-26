@@ -22,6 +22,14 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', updateScrollPercentage);
+
+        document.addEventListener('DOMContentLoaded', function() {{
+            var blurb = document.getElementById('section_blurb');
+            if (blurb && blurb.textContent.trim() !== '') {{
+                blurb.textContent = ' | ' + blurb.textContent;
+            }}
+        }});
+
     </script>
 </head>
 
@@ -38,9 +46,10 @@
     </div>
     <div id="top_spacer">&nbsp;</div>
 
-    <h3 class="section_title">{section_title}</h3>
+    <h6 class="section_title">{section_title} <span id="section_blurb">{section_blurb}</span></h6>
     <h1>{title}</h1>
-    <p><b class="read_time">{read_time}</b></p>
+    <h5>{subtitle}</h5>
+    <h6>{read_time}</h6>
     {content}
 
     

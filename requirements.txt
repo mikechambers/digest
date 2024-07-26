@@ -1,5 +1,4 @@
 requests
 browsercookie
-readability-lxml
-lxml_html_clean
+beautifulsoup4
 readtime

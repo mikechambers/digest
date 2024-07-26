@@ -23,7 +23,6 @@
 import argparse
 import sys
 import requests
-from readability import Document
 import browsercookie
 import re
 import os
@@ -32,10 +31,11 @@ import shutil
 from datetime import datetime, timezone
 import readtime
 import uuid
+from bs4 import BeautifulSoup
 
 BASE_URL = "https://www.economist.com"
 WEEKLY_URL = f"{BASE_URL}/weeklyedition/"
-VERSION = "0.85.1"
+VERSION = "0.85.2"
 
 INDEX_TEMPLATE = "index.html"
 ARTICLE_TEMPLATE = "article.html"
@@ -71,8 +71,6 @@ SECTION_INFO = [
     {"title": "Obituary", "slug": "/obituary/"}
 ]
 
-#SECTION_INFO = [{"title": "The Americas", "slug": "/the-americas/"}]
-
 session = None
 
 dir_slug = None
@@ -89,6 +87,7 @@ def main():
     create_dir(output_dir)
 
     init_session()
+
     sections = parse_sections()
 
     output_dir = os.path.join(output_dir, dir_slug)
@@ -111,6 +110,20 @@ def main():
         os.path.join(output_dir, STYLE_FILE)
     )
 
+def test():
+    html_content = load_url("https://www.economist.com/united-states/2024/07/25/which-kamala-harris-is-now-at-the-top-of-the-democratic-ticket")["text"]
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    #paragraphs = soup.find_all('p', {'data-component' : 'paragraph'})
+
+    article = soup.find('div', {'class': 'css-1x0aq03 e13topc92'})
+
+    tags = article.find_all(lambda tag: 
+                     (tag.name == 'p' and tag.get('data-component') == 'paragraph') or 
+                     tag.name == 'figure')
+
+    for idx, tag in enumerate(tags):
+        print(tag.name)
 
 def create_dir(path, delete=False):
     if os.path.exists(path):
@@ -231,7 +244,9 @@ def build_sections(sections):
             next_title=next_title,
             next_url = next_url,
             economist_url = article["url"],
-            read_time = read_time
+            read_time = read_time,
+            subtitle = article["subtitle"],
+            section_blurb = article["section_blurb"]
         )
     
         write_file(article["dir"], article["file_name"], output)
@@ -251,6 +266,126 @@ def write_file(dir, file_name, data):
         file.write(data)
 
 def load_articles(sections):
+
+    if verbose:
+        print(f"Retrieving articles")
+
+    for section in sections:
+        articles = []
+        for u in section["urls"]:
+            u = f"{BASE_URL}{u}"
+            
+            root = load_url(u)
+
+            #doc = Document(input = article["text"])
+
+            soup = BeautifulSoup(root["text"], 'html.parser')
+            
+            print(root["url"])
+
+            #article = soup.find('div', {'class': 'css-1x0aq03 e13topc92'})
+
+            article = soup.find('section', {'data-body-id': 'cp2'})
+            
+            if article is None:
+                t = soup.find_all('section')
+                for a in t:
+                    print(a)
+
+            title_regex = re.compile(r'css-(1p83fk8|3swi83) e1r8fcie0')
+            title = soup.find('h1', {'class': title_regex})
+            title = title.decode_contents()
+
+            subtitle_regex = re.compile(r'css-(1ms10sa|1ss9ydi) eg03uz0')
+            subtitle_tag = soup.find('h2', {'class' : subtitle_regex})
+     
+            subtitle = ""
+            if subtitle_tag:
+                subtitle = subtitle_tag.decode_contents()
+
+            section_blurb_tag = soup.find('span', {'class':'css-rjcumh e1vi1cqp0'})
+
+            pre_section_tag = soup.find('section', {'class':'css-1ugvd2u e18wk22u0'})
+
+            pre_section_figure_tag = None
+            if pre_section_tag:
+                pre_section_figure_tag = pre_section_tag.find('figure')
+
+            content_body = ""
+            if pre_section_figure_tag:
+                img_html = soup_img_from_figure(pre_section_figure_tag)
+
+                if img_html:
+                    content_body += img_html
+
+            section_blurb = ""
+            if section_blurb_tag:
+                match = re.search(r'<!-- -->\s*(.*)', section_blurb_tag.decode_contents())
+
+                if match:
+                    section_blurb = str(match.group(1))
+
+
+            #remove aside tags
+            for s in article.select('aside'):
+                s.extract()
+
+            tags = article.find_all(lambda tag: 
+                     (tag.name == 'p' and tag.get('data-component') == 'paragraph') or 
+                     tag.name == 'figure')
+
+            for idx, tag in enumerate(tags):
+                if tag.name == 'p':
+                    #content_body += str(tag)
+                    content_body += f"<p>{tag.decode_contents()}</p>\n"
+                elif tag.name == 'figure':
+                    #img_tag = tag.find('img')
+
+                    img_html = soup_img_from_figure(tag)
+
+                    if img_html:
+                        content_body += img_html
+
+                    #if img_tag and 'src' in img_tag.attrs:
+                    #    img_url = img_tag['src']
+                        
+                    #    content_body += f"<img src='{img_url}' class='parsed_image' />"
+
+            content = f"<div>{content_body}</div>"
+
+            audio = soup.find('audio')
+
+            mp3 = None
+            if audio:
+                mp3 = audio["src"]
+
+            articles.append({
+                "title":title, 
+                "content":content,
+                "url":u,
+                "file_name": f"{u.split('/')[-1]}.html",
+                "dir": section['section']['slug'].strip('/'),
+                "mp3":mp3,
+                "subtitle":subtitle,
+                "section_blurb":section_blurb
+            })
+
+        section["articles"] = articles
+
+    return sections
+
+def soup_img_from_figure(tag):
+    img_tag = tag.find('img')
+
+    if img_tag and 'src' in img_tag.attrs:
+        img_url = img_tag['src']
+
+        return f"<p><img src='{img_url}' class='parsed_image' />\n</p>"
+    else:
+        return None
+                    
+
+def load_articles2(sections):
 
     if verbose:
         print(f"Retrieving articles")
@@ -335,7 +470,7 @@ def build_index(sections):
         if not section['articles']:
             continue
 
-        output += f"<h2>{section['section']['title']}</h2>\n"
+        output += f"<h4>{section['section']['title']}</h4>\n"
 
         output += "<div><ul class='section-list'>"
         for article in section['articles']:

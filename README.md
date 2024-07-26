@@ -32,7 +32,7 @@ This project requires that you have access to the digital version of the Economi
 
 ## Installation
 
-The script requires Python3 and the following libraries to be installed.
+The script requires Python3 and a number of libraries to be installed. You can install the required libraries with:
 
 ```bash
 pip install -r requirements.txt

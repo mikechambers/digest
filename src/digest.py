@@ -72,6 +72,11 @@ SECTION_INFO = [
     {"title": "Obituary", "slug": "/obituary/"}
 ]
 
+#SECTION_INFO = [
+#    {"title": "The World This Week", "slug": "/the-world-this-week/"},
+#    {"title": "United States", "slug": "/united-states/"}
+#]
+
 session = None
 
 dir_slug = None
@@ -124,12 +129,19 @@ def create_dir(path, delete=False):
 
     os.makedirs(path)
 
+def clean_tags(tag):
+    for child in tag.find_all(recursive=False):  # Iterate over direct children
+        if child.name not in ['a', 'i']:  # If the child is not an <a> or <i> tag
+            if child.string:
+                child.replace_with(child.string)
+            else:
+                clean_tags(child)
+                child.unwrap()
+
 def build_podcast(sections):
 
     if verbose:
         print(f"Generating podcast file")
-
-    #item_template = load_template(PODCAST_ITEM_TEMPLATE)
 
     second = 59
     minute = 59
@@ -296,6 +308,7 @@ def load_articles(sections):
             article = soup.find('section', {'data-body-id': 'cp2'})
 
             if article is None:
+                print(soup)
                 article = soup.find('section', {'class':"css-k2wbwk e13topc91"})
 
             title_regex = re.compile(r'css-(1p83fk8|3swi83) e1r8fcie0')
@@ -324,7 +337,7 @@ def load_articles(sections):
                 if img_html:
                     content.append(img_html)
 
-            section_blurb = ""
+            section_blurb = None
             if section_blurb_tag:
                 match = re.search(r'<!-- -->\s*(.*)', section_blurb_tag.decode_contents())
 
@@ -333,19 +346,21 @@ def load_articles(sections):
 
 
             #remove aside tags
-
             for s in article.select('aside'):
                 s.extract()
 
             tags = article.find_all(lambda tag: 
                      (tag.name == 'p' and tag.get('data-component') == 'paragraph') or 
+                     tag.name == 'h2' or
                      tag.name == 'figure')
 
             for idx, tag in enumerate(tags):
                 if tag.name == 'p':
-                    #content_body += str(tag)
-                    #content_body += f"<p>{tag.decode_contents()}</p>\n"
+                    #content.append(tag.decode_contents())
+                    clean_tags(tag)
                     content.append(tag.decode_contents())
+                elif tag.name == 'h2':
+                    content.append(f"<b>{tag.decode_contents()}</b>")
                 elif tag.name == 'figure':
                     #img_tag = tag.find('img')
 

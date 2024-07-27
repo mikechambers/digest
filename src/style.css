@@ -113,12 +113,20 @@ p * {
     font-size: 1em;
 }
 
+.caps {
+    text-transform: uppercase;
+}
+
 a {
     color: rgb(65, 110, 210);
 }
 
 p a {
     text-decoration: none;
+}
+
+p:has(> b) {
+    margin-bottom: -25px;
 }
 
 #section_blurb {

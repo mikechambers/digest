@@ -93,19 +93,24 @@ def main():
 
     env = Environment(loader=FileSystemLoader('templates'))
 
+    # get absolute path to output directory
     output_dir = os.path.abspath(output_dir)
+
+    # make sure it exists
     create_dir(output_dir)
 
     init_session()
 
+    # parse weekly edition. This will also define the dir_slug
     sections = parse_sections()
 
+    # create the dir we will write the edition to, based on the parsed weekly edition
+    # date / url
     output_dir = os.path.join(output_dir, dir_slug)
-  
+    create_dir(output_dir, True)
+    
     if verbose:
         print(f"Writing to {output_dir}")
-
-    create_dir(output_dir, True)
 
     sections = load_articles(sections)
 
@@ -120,6 +125,7 @@ def main():
         os.path.join(output_dir, STYLE_FILE)
     )
 
+# create dir at specified path
 def create_dir(path, delete=False):
     if os.path.exists(path):
         if delete:
@@ -129,20 +135,26 @@ def create_dir(path, delete=False):
 
     os.makedirs(path)
 
+# Filter out unwanted tags from content, while keeping text
 def clean_tags(tag):
-    for child in tag.find_all(recursive=False):  # Iterate over direct children
-        if child.name not in ['a', 'i']:  # If the child is not an <a> or <i> tag
+    for child in tag.find_all(recursive=False):
+        # Keep <a> and <i> tags
+        if child.name not in ['a', 'i']:
             if child.string:
                 child.replace_with(child.string)
             else:
                 clean_tags(child)
                 child.unwrap()
 
+# generate and write the podcast xml file
 def build_podcast(sections):
 
     if verbose:
         print(f"Generating podcast file")
 
+    # we slightly change the date of each item so we can order them
+    # We probably don't need this anymore since we can set the format to serial
+    # and explicitly set the index / order
     second = 59
     minute = 59
     now = datetime.now(timezone.utc)
@@ -162,6 +174,7 @@ def build_podcast(sections):
             build_date = now.strftime('%a, %d %b %Y %H:%M:%S GMT')
             second -= 1
 
+            #slightly change the minutes / second for the next date used
             if second < 1:
                 second = 59
                 minute -= 1
@@ -200,7 +213,8 @@ def build_podcast(sections):
 
     write_file(output_dir, PODCAST_TEMPLATE, output)
 
-
+# write out section directories and individual articles based
+# on the parsed data
 def build_sections(sections):
     
     if verbose:
@@ -215,6 +229,8 @@ def build_sections(sections):
             items.append({"article":article, "section":section})
 
     num_articles = len(items)
+
+    # Loop through the articles in order so we can determine next / prev article
     for i in range(num_articles):
         article = items[i]["article"]
         section = items[i]["section"]
@@ -231,16 +247,14 @@ def build_sections(sections):
         next_article = items[i+1]["article"] if i < num_articles - 1 else None
 
         if prev_article:
-            #prev_article = prev_article["article"]
             prev_title = prev_article["title"]
             prev_url = f"../{prev_article["dir"]}/{prev_article["file_name"]}"
 
         if next_article:
-            #next_article = next_article["article"]
             next_title = next_article["title"]
             next_url = f"../{next_article["dir"]}/{next_article["file_name"]}"
 
-
+        #figure out how long it will take to read the article
         read_time = readtime.of_html(''.join(content), wpm=reading_rate)
 
         context = {
@@ -257,12 +271,13 @@ def build_sections(sections):
             'section_blurb': article["section_blurb"]
         }
 
-        # Add previous and next titles to the output
         output = template.render(context)
     
+        #write out the article
         write_file(article["dir"], article["file_name"], output)
 
 
+# Write the string data to the specified file / directory
 def write_file(dir, file_name, data):
 
     section_dir = os.path.join(output_dir, dir)
@@ -276,6 +291,7 @@ def write_file(dir, file_name, data):
     with open(file_path, 'w', encoding='utf-8') as file:
         file.write(data)
 
+# load and parse all of the articles
 def load_articles(sections):
 
     if verbose:
@@ -318,8 +334,6 @@ def load_articles(sections):
             subtitle = ""
             if subtitle_tag:
                 subtitle = subtitle_tag.decode_contents()
-
-
 
             #check if there is a pre-section before the article (sometimes includes
             #an image)
@@ -409,6 +423,7 @@ def load_articles(sections):
 
     return sections
 
+# retrieve IMG tag from figure tag
 def soup_img_from_figure(tag):
     img_tag = tag.find('img')
 
@@ -418,7 +433,8 @@ def soup_img_from_figure(tag):
         return f"<img src='{img_url}' class='parsed_image' />"
     else:
         return None
-                    
+
+#build the main index.html page              
 def build_index(sections):
 
     if verbose:
@@ -436,6 +452,7 @@ def build_index(sections):
 
     write_file(output_dir, "index.html", output)
 
+# Parse the sections / and find the articles from the currently weekly edition
 def parse_sections():
 
     if verbose:
@@ -478,6 +495,7 @@ def parse_sections():
 
     return sections
 
+# remove duplicate strongs from a list while maintaining order
 def remove_duplicate_strings(items):
     seen = set()
     unique_items = []
@@ -488,6 +506,7 @@ def remove_duplicate_strings(items):
     return unique_items
 
 
+# extract date from URL
 def extract_date_from_url(url):
 
     global dir_slug
@@ -505,6 +524,8 @@ def extract_date_from_url(url):
     else:
         None
 
+# load a remote URL and return a Dict that contains a string of the data
+# and the final url that the data was loaded from (after re-directs)
 def load_url(url):
 
     if verbose:
@@ -518,6 +539,11 @@ def load_url(url):
     else:
         raise Exception(f"Non 200 Status code returned ({code}) : {url}")
 
+# init the remote session and cookies that will be used for that session. This
+# is used to grab the cookies from the specified browser to provide access to logged
+# in content for the economist
+#
+# You must first manually log in in one of the supported browsers
 def init_session():
     global session
 
@@ -538,6 +564,7 @@ def init_session():
 
     session.headers.update(headers)
     
+# Retrieve the cookies from the browser based on arguments / defaults
 def get_browser_cookies(browser_name):
 
     if browser_name.lower() == 'chrome':
@@ -550,6 +577,7 @@ def get_browser_cookies(browser_name):
         return browsercookie.opera()
     else:
         raise ValueError("Unsupported --cookie-source name. Supported browsers: 'chrome', 'firefox', 'edge', 'opera'.")    
+
 
 if __name__ == "__main__":
 

@@ -4,18 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title}</title>
+    <title>{{title}}</title>
     <link rel="stylesheet" type="text/css" href="../style.css">
 
     <script defer>
-        function updateScrollPercentage() {{
+        function updateScrollPercentage() {
             var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
             var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
             var clientHeight = document.documentElement.clientHeight || window.innerHeight;
             var scrollPercent = Math.round((scrollTop / (scrollHeight - clientHeight)) * 100);
 
             document.documentElement.style.setProperty('--scroll-percentage', scrollPercent + '%');
-        }}
+        }
 
         window.addEventListener('scroll', updateScrollPercentage);
         window.addEventListener('resize', updateScrollPercentage);
@@ -23,12 +23,12 @@
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', updateScrollPercentage);
 
-        document.addEventListener('DOMContentLoaded', function() {{
+        document.addEventListener('DOMContentLoaded', function() {
             var blurb = document.getElementById('section_blurb');
-            if (blurb && blurb.textContent.trim() !== '') {{
+            if (blurb && blurb.textContent.trim() !== '') {
                 blurb.textContent = ' | ' + blurb.textContent;
-            }}
-        }});
+            }
+        });
 
     </script>
 </head>
@@ -41,21 +41,24 @@
         </div>
         <div class="header">
             <div><a href="../index.html">Index</a></div>
-            <div><a href="{economist_url}">Read on Economist.com</a></div>
+            <div><a href="{{economist_url}}">Read on Economist.com</a></div>
         </div>
     </div>
     <div id="top_spacer">&nbsp;</div>
 
-    <h6 class="section_title">{section_title} <span id="section_blurb">{section_blurb}</span></h6>
-    <h1>{title}</h1>
-    <h5>{subtitle}</h5>
-    <h6>{read_time}</h6>
-    {content}
-
+    <h6 class="section_title">{{section_title}} <span id="section_blurb">{{section_blurb}}</span></h6>
+    <h1>{{title}}</h1>
+    <h5>{{subtitle}}</h5>
+    <h6>{{read_time}}</h6>
+    <div>
+        {% for c in content %}
+            <p>{{c}}</p>
+        {% endfor %}
+    </div>
     
     <div class="footer">
-        <div><a href="{prev_url}">{prev_title}</a></div>
-        <div class="footer_right"><a href="{next_url}">{next_title}</a></div>
+        <div><a href="{{prev_url}}">{{prev_title}}</a></div>
+        <div class="footer_right"><a href="{{next_url}}">{{next_title}}</a></div>
     </div>
 </body>
 

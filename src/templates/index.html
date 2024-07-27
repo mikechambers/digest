@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+    <div class="header">
+        <div><a href="podcast.xml">Podcast XML</a></div>
+        <div><a href="{{weekly_url}}">Read on Economist.com</a></div>
+    </div>
+
+    <h1>{{title}}</h1>
+    {% for section in sections %}
+
+        {% if section.articles is not none and section.articles|length > 0 %}
+
+        <h4>{{section.section.title}}</h4>
+        <div>
+            <ul class="section-list">
+                {% for article in section.articles%}
+                <li>
+                    <a href="{{article.dir}}/{{article.file_name}}">{{article.title}}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    {% endfor %}
+</body>
+
+</html>

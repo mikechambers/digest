@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="https://media.rss.com/style.xsl"?>
 <rss xmlns:podcast="https://podcastindex.org/namespace/1.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" xml:lang="en" version="2.0">
   <channel>
-    <title><![CDATA[Economist Digest {edition_date}]]></title>
+    <title><![CDATA[Economist Digest {{edition_date}}]]></title>
     <link>https://github.com/mikechambers/digest</link>
     <atom:link href="podcast.xml" rel="self" type="application/rss+xml"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
-    <description><![CDATA[<p>Economist Digest {edition_date}</p>]]></description>
+    <description><![CDATA[<p>Economist Digest {{edition_date}}</p>]]></description>
     <generator>https://github.com/mikechambers/digest</generator>
-    <lastBuildDate>{build_date}</lastBuildDate>
+    <lastBuildDate>{{build_date}}</lastBuildDate>
     <language>en</language>
     <copyright><![CDATA[]]></copyright>
     <itunes:image href="https://assets.rss.com/images/no-cover-1400.jpg"/>
-    <podcast:guid>{uuid}</podcast:guid>
+    <podcast:guid>{{uuid}}</podcast:guid>
     <image>
       <url>https://assets.rss.com/images/no-cover-1400.jpg</url>
       <title>Economist Digest</title>
@@ -27,6 +26,20 @@
     <itunes:explicit>false</itunes:explicit>
     <itunes:type>serial</itunes:type>
     <itunes:category text="News"/>
-    {items}
+    {% for item in items %}
+    <item>
+      <title><![CDATA[{{item.title}}]]></title>
+      <itunes:title><![CDATA[{{item.title}}]]></itunes:title>
+      <description><![CDATA[<p>{{item.description}}</p>]]></description>
+      <link>{{item.url}}</link>
+      <enclosure url="{{item.mp3}}" length="6794963" type="audio/mpeg"/>
+      <guid isPermaLink="false">{{item.uuid}}</guid>
+      <itunes:duration>411</itunes:duration>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:episode>{{item.index}}</itunes:episode>
+      <itunes:explicit>false</itunes:explicit>
+      <pubDate>{{item.build_date}}</pubDate>
+    </item>
+    {% endfor %}
   </channel>
 </rss>

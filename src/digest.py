@@ -32,6 +32,7 @@ from datetime import datetime, timezone
 import readtime
 import uuid
 from bs4 import BeautifulSoup
+from jinja2 import Environment, FileSystemLoader
 
 BASE_URL = "https://www.economist.com"
 WEEKLY_URL = f"{BASE_URL}/weeklyedition/"
@@ -80,9 +81,13 @@ weekly_url = None
 
 reading_rate = 250
 
-def main():
+env = None
 
-    global output_dir
+def main():
+    global output_dir, env
+
+    env = Environment(loader=FileSystemLoader('templates'))
+
     output_dir = os.path.abspath(output_dir)
     create_dir(output_dir)
 
@@ -110,21 +115,6 @@ def main():
         os.path.join(output_dir, STYLE_FILE)
     )
 
-def test():
-    html_content = load_url("https://www.economist.com/united-states/2024/07/25/which-kamala-harris-is-now-at-the-top-of-the-democratic-ticket")["text"]
-    soup = BeautifulSoup(html_content, 'html.parser')
-
-    #paragraphs = soup.find_all('p', {'data-component' : 'paragraph'})
-
-    article = soup.find('div', {'class': 'css-1x0aq03 e13topc92'})
-
-    tags = article.find_all(lambda tag: 
-                     (tag.name == 'p' and tag.get('data-component') == 'paragraph') or 
-                     tag.name == 'figure')
-
-    for idx, tag in enumerate(tags):
-        print(tag.name)
-
 def create_dir(path, delete=False):
     if os.path.exists(path):
         if delete:
@@ -139,7 +129,7 @@ def build_podcast(sections):
     if verbose:
         print(f"Generating podcast file")
 
-    item_template = load_template(PODCAST_ITEM_TEMPLATE)
+    #item_template = load_template(PODCAST_ITEM_TEMPLATE)
 
     second = 59
     minute = 59
@@ -147,12 +137,14 @@ def build_podcast(sections):
 
     items = []
     index = 1
+
     for section in sections:
         for article in section["articles"]:
-            title = f"{section["section"]["title"]} : {article["title"]}"
-        
+
             mp3 = article["mp3"]
-            url = article["url"]
+
+            if not mp3:
+                continue
 
             now = now.replace(minute = minute, second=second, microsecond=0)
             build_date = now.strftime('%a, %d %b %Y %H:%M:%S GMT')
@@ -161,7 +153,18 @@ def build_podcast(sections):
             if second < 1:
                 second = 59
                 minute -= 1
+            
+            items.append({
+                "title" : f"{section["section"]["title"]} : {article["title"]}",
+                "description":article["subtitle"] or "",
+                "mp3" : mp3,
+                "build_date" : build_date,
+                "index" : index,
+                "url" : article["url"],
+                "uuid" : uuid.uuid4()
+            })
 
+            """
             items.append(
                 item_template.format(
                     title = title,
@@ -171,25 +174,33 @@ def build_podcast(sections):
                     url = url
                 )
             )
+            """
 
             index += 1
 
-    template = load_template(PODCAST_TEMPLATE)
+
+    #template = load_template(PODCAST_TEMPLATE)
+
+    template = env.get_template(PODCAST_TEMPLATE)
+
 
     if verbose:
         print(f"Found {len(items)} mp3s")
 
-
     id = uuid.uuid4()
-    output = template.format(
-        edition_date = edition_date,
-        build_date = build_date,
-        uuid = id,
-        items = "\n".join(items)
-    )
+
+    context = {
+        "edition_date" : edition_date,
+        "build_date" : build_date,
+        "uuid" : id,
+        "items" : items
+    }
+
+    output = template.render(context)
 
     if verbose:
         print(f"Saving podcast file")
+
     write_file(output_dir, PODCAST_TEMPLATE, output)
 
 
@@ -198,7 +209,7 @@ def build_sections(sections):
     if verbose:
         print(f"Generating article files")
 
-    template = load_template(ARTICLE_TEMPLATE)
+    template = env.get_template(ARTICLE_TEMPLATE)
 
     items = []
 
@@ -232,22 +243,26 @@ def build_sections(sections):
             next_title = next_article["title"]
             next_url = f"../{next_article["dir"]}/{next_article["file_name"]}"
 
-        read_time = readtime.of_html(content, wpm=reading_rate)
+
+        read_time = readtime.of_html(''.join(content), wpm=reading_rate)
+
+        context = {
+            'content': content,
+            'section_title': section["section"]["title"],
+            'title': title,
+            'prev_title': prev_title,
+            'prev_url': prev_url,
+            'next_title': next_title,
+            'next_url': next_url,
+            'economist_url': article["url"],
+            'read_time': read_time,
+            'subtitle': article["subtitle"],
+            'section_blurb': article["section_blurb"]
+        }
+
 
         # Add previous and next titles to the output
-        output = template.format(
-            content=content,
-            section_title = section["section"]["title"],
-            title=title,
-            prev_title=prev_title,
-            prev_url = prev_url,
-            next_title=next_title,
-            next_url = next_url,
-            economist_url = article["url"],
-            read_time = read_time,
-            subtitle = article["subtitle"],
-            section_blurb = article["section_blurb"]
-        )
+        output = template.render(context)
     
         write_file(article["dir"], article["file_name"], output)
 
@@ -276,21 +291,12 @@ def load_articles(sections):
             u = f"{BASE_URL}{u}"
             
             root = load_url(u)
-
-            #doc = Document(input = article["text"])
-
             soup = BeautifulSoup(root["text"], 'html.parser')
             
-            print(root["url"])
-
-            #article = soup.find('div', {'class': 'css-1x0aq03 e13topc92'})
-
             article = soup.find('section', {'data-body-id': 'cp2'})
-            
+
             if article is None:
-                t = soup.find_all('section')
-                for a in t:
-                    print(a)
+                article = soup.find('section', {'class':"css-k2wbwk e13topc91"})
 
             title_regex = re.compile(r'css-(1p83fk8|3swi83) e1r8fcie0')
             title = soup.find('h1', {'class': title_regex})
@@ -311,12 +317,12 @@ def load_articles(sections):
             if pre_section_tag:
                 pre_section_figure_tag = pre_section_tag.find('figure')
 
-            content_body = ""
+            content = []
             if pre_section_figure_tag:
                 img_html = soup_img_from_figure(pre_section_figure_tag)
 
                 if img_html:
-                    content_body += img_html
+                    content.append(img_html)
 
             section_blurb = ""
             if section_blurb_tag:
@@ -327,6 +333,7 @@ def load_articles(sections):
 
 
             #remove aside tags
+
             for s in article.select('aside'):
                 s.extract()
 
@@ -337,21 +344,15 @@ def load_articles(sections):
             for idx, tag in enumerate(tags):
                 if tag.name == 'p':
                     #content_body += str(tag)
-                    content_body += f"<p>{tag.decode_contents()}</p>\n"
+                    #content_body += f"<p>{tag.decode_contents()}</p>\n"
+                    content.append(tag.decode_contents())
                 elif tag.name == 'figure':
                     #img_tag = tag.find('img')
 
                     img_html = soup_img_from_figure(tag)
 
                     if img_html:
-                        content_body += img_html
-
-                    #if img_tag and 'src' in img_tag.attrs:
-                    #    img_url = img_tag['src']
-                        
-                    #    content_body += f"<img src='{img_url}' class='parsed_image' />"
-
-            content = f"<div>{content_body}</div>"
+                        content.append(img_html)
 
             audio = soup.find('audio')
 
@@ -380,115 +381,24 @@ def soup_img_from_figure(tag):
     if img_tag and 'src' in img_tag.attrs:
         img_url = img_tag['src']
 
-        return f"<p><img src='{img_url}' class='parsed_image' />\n</p>"
+        return f"<img src='{img_url}' class='parsed_image' />"
     else:
         return None
                     
-
-def load_articles2(sections):
-
-    if verbose:
-        print(f"Retrieving articles")
-
-    for section in sections:
-        articles = []
-        for u in section["urls"]:
-            u = f"{BASE_URL}{u}"
-            
-            article = load_url(u)
-
-            doc = Document(input = article["text"])
-
-            #extract mp3
-            pattern = r'https:\/\/[^\s]*\.mp3'
-            matches = re.findall(pattern, article["text"])
-
-            mp3 = None
-            if matches:
-                mp3 = matches[0]
-
-            title = doc.title()
-            content = doc.summary(html_partial=True)
-
-            content = fix_content(content, article["text"], u)
-
-            articles.append({
-                "title":title, 
-                "content":content,
-                "url":u,
-                "file_name": f"{u.split('/')[-1]}.html",
-                "dir": section['section']['slug'].strip('/'),
-                "mp3":mp3
-            })
-
-        section["articles"] = articles
-
-    return sections
-
-def fix_content(content, raw, url):
-    if url.endswith("kals-cartoon"):
-        kal_pattern = r'https:\/\/www\.economist\.com\/cdn-cgi\/image\/width=\d{4},quality=\d{2},format=auto\/content-assets\/images\/\d{8}_WWD\d{3}\.png'
-        kal_matches = re.findall(kal_pattern, raw)
-
-        if kal_matches:
-            content = f"<div><img src='{kal_matches[0]}' id='kal_image' /></div>"
-
-    elif url.endswith("this-weeks-covers"):
-        cover_pattern = r'https:\/\/www\.economist\.com\/cdn-cgi\/image\/width=\d{4},quality=\d{2},format=auto\/content-assets\/images\/\d{8}_[A-Z]{2}_[A-Z]{2}\.jpg(?=")'
-
-        cover_matches = re.findall(cover_pattern, raw)
-
-        tmp = ""
-        for m in cover_matches:
-            tmp += f"<img src='{m}' id='cover_image' />"
-        
-        if cover_matches:
-            content = f"<div>{tmp}</div>{content}"
-
-    elif url.endswith("economic-data-commodities-and-markets"):
-        pattern = r'https:\/\/www\.economist\.com\/cdn-cgi\/image\/width=\d{4},quality=\d{2},format=auto\/content-assets\/images\/\d{8}_INT\d{3}\.png(?=")'
-        
-        matches = re.findall(pattern, raw)
-
-        tmp = ""
-        for m in matches:
-            tmp += f"<div><img src='{m}' id='data_image' /></div>"
-        
-        if matches:
-            content = f"<div>{tmp}</div>"
-
-    return content
-
 def build_index(sections):
 
     if verbose:
         print(f"Generating index")
 
-    output = ""
-    for section in sections:
+    template = env.get_template(INDEX_TEMPLATE)
 
-        if not section['articles']:
-            continue
+    context = {
+        "sections":sections,
+        "title":edition_date,
+        "weekly_url":weekly_url
+    }
 
-        output += f"<h4>{section['section']['title']}</h4>\n"
-
-        output += "<div><ul class='section-list'>"
-        for article in section['articles']:
-            #{url.split('/')[-1]}
-            title = article["title"]
-            file_name = article["file_name"]
-            dir = article["dir"]
-            output += f"<li><a href='{dir}/{file_name}'>{title}</a></li>\n"
-
-        output += "</ul></div>\n"
-
-    template = load_template(INDEX_TEMPLATE)
-    
-    output = template.format(
-        content = output,
-        title=edition_date,
-        weekly_url = weekly_url
-    )
+    output = template.render(context)
 
     write_file(output_dir, "index.html", output)
 
@@ -605,23 +515,7 @@ def get_browser_cookies(browser_name):
     elif browser_name.lower() == 'opera':
         return browsercookie.opera()
     else:
-        raise ValueError("Unsupported --cookie-source name. Supported browsers: 'chrome', 'firefox', 'edge', 'opera'.")
-
-
-def load_template(template):
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    # Construct the full path to the file relative to the script
-    file_path = os.path.join(script_dir, template)
-
-    if verbose:
-        print(f"Loading template {file_path}")
-
-    with open(file_path, 'r', encoding='utf-8') as file:
-        file_content = file.read()
-    
-    return file_content
-    
+        raise ValueError("Unsupported --cookie-source name. Supported browsers: 'chrome', 'firefox', 'edge', 'opera'.")    
 
 if __name__ == "__main__":
 

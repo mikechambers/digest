@@ -79,7 +79,6 @@ Also, in order to add the URL to your podcasting app, you may need to host it on
 
 ## Known Issues
 
-* Occasionally the script will error out with **AttributeError: 'NoneType' object has no attribute 'select'** When this happens, just re-run the script
 * There's no support for Brave browser yet.
 
 ## Questions, Feature Requests, Feedback

@@ -74,7 +74,7 @@ SECTION_INFO = [
 
 #SECTION_INFO = [
 #    {"title": "The World This Week", "slug": "/the-world-this-week/"},
-#    {"title": "United States", "slug": "/united-states/"}
+#    {"title": "Leaders", "slug": "/leaders/"},
 #]
 
 session = None
@@ -108,7 +108,7 @@ def main():
     # date / url
     output_dir = os.path.join(output_dir, dir_slug)
     create_dir(output_dir, True)
-    
+
     if verbose:
         print(f"Writing to {output_dir}")
 
@@ -139,7 +139,7 @@ def create_dir(path, delete=False):
 def clean_tags(tag):
     for child in tag.find_all(recursive=False):
         # Keep <a> and <i> tags
-        if child.name not in ['a', 'i']:
+        if child.name not in ['a', 'i', 'b', 'small']:
             if child.string:
                 child.replace_with(child.string)
             else:
@@ -305,14 +305,10 @@ def load_articles(sections):
             root = load_url(u)
             soup = BeautifulSoup(root["text"], 'html.parser')
             
-            #find root of article
-            article = soup.find('section', {'data-body-id': 'cp2'})
-
-            #rarely article won't be included, this is a fallback (which I dont
-            #think works).
-            if article is None:
-                print(soup)
-                article = soup.find('section', {'class':"css-k2wbwk e13topc91"})
+            #find root of article. usually cp2, but sometimes cp1
+            article_regex = re.compile(r'cp[12]')
+            article = soup.find('section', {'data-body-id': article_regex})
+            #article = soup.find('section', {'data-body-id': 'cp2'})
 
             #if still none then we bail out
             if article is None:
@@ -335,22 +331,24 @@ def load_articles(sections):
             if subtitle_tag:
                 subtitle = subtitle_tag.decode_contents()
 
-            #check if there is a pre-section before the article (sometimes includes
-            #an image)
-            pre_section_tag = soup.find('section', {'class':'css-1ugvd2u e18wk22u0'})
-
-            pre_section_figure_tag = None
-            if pre_section_tag:
-                pre_section_figure_tag = pre_section_tag.find('figure')
-
             #List that contains the elements to create the page
             content = []
 
-            if pre_section_figure_tag:
-                img_html = soup_img_from_figure(pre_section_figure_tag)
+            #check if there is a pre-section before the article (sometimes includes
+            #an image)
+            pre_section_tag = soup.find('section', {'class':'css-1ugvd2u e18wk22u0'})
+            img_html = extract_figure_img(pre_section_tag)
 
-                if img_html:
-                    content.append(img_html)
+            if img_html:
+                content.append(img_html)
+
+            #this check for images in Leaders section which are formatted slightly
+            #different
+            leader_pre = soup.find('div', {'data-test-id':'default-theme'})
+            img_html = extract_figure_img(leader_pre)
+
+            if img_html:
+                content.append(img_html)
 
             #grab section blurb (may be None)
             section_blurb_tag = soup.find('span', {'class':'css-rjcumh e1vi1cqp0'})
@@ -385,7 +383,7 @@ def load_articles(sections):
                     content.append(tag.decode_contents())
 
                 elif tag.name == 'h2':
-                    content.append(f"<b>{tag.decode_contents()}</b>")
+                    content.append(f"<span class='article_section'>{tag.decode_contents()}</span>")
 
                 elif tag.name == 'figure':
 
@@ -422,6 +420,19 @@ def load_articles(sections):
         section["articles"] = articles
 
     return sections
+
+def extract_figure_img(tag):
+
+    if tag is None:
+        return None
+
+    figure = tag.find('figure')
+
+    img_html = None
+    if figure:
+        img_html = soup_img_from_figure(figure)
+
+    return img_html
 
 # retrieve IMG tag from figure tag
 def soup_img_from_figure(tag):

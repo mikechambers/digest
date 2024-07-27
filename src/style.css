@@ -127,13 +127,17 @@ p a {
 
 /*
     this is for section titles in article. Use negative margin so to tweak the spacing
-    to bring it closer to the section its associated with. Otherwise the marging on that P
+    to bring it closer to the section its associated with. Otherwise the margin on that P
     pushes it up
 
-    Basically P that contains a B
+    Basically P that contains an element with class .article_section
 */
-p:has(> b) {
+p:has(> .article_section) {
     margin-bottom: -25px;
+}
+
+.article_section {
+    font-weight: bold;
 }
 
 #section_blurb {

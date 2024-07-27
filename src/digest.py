@@ -176,22 +176,7 @@ def build_podcast(sections):
                 "uuid" : uuid.uuid4()
             })
 
-            """
-            items.append(
-                item_template.format(
-                    title = title,
-                    mp3 = mp3,
-                    build_date = build_date,
-                    index = index,
-                    url = url
-                )
-            )
-            """
-
             index += 1
-
-
-    #template = load_template(PODCAST_TEMPLATE)
 
     template = env.get_template(PODCAST_TEMPLATE)
 
@@ -272,7 +257,6 @@ def build_sections(sections):
             'section_blurb': article["section_blurb"]
         }
 
-
         # Add previous and next titles to the output
         output = template.render(context)
     
@@ -305,16 +289,29 @@ def load_articles(sections):
             root = load_url(u)
             soup = BeautifulSoup(root["text"], 'html.parser')
             
+            #find root of article
             article = soup.find('section', {'data-body-id': 'cp2'})
 
+            #rarely article won't be included, this is a fallback (which I dont
+            #think works).
             if article is None:
                 print(soup)
                 article = soup.find('section', {'class':"css-k2wbwk e13topc91"})
 
+            #if still none then we bail out
+            if article is None:
+                if verbose:
+                    print(f"URL : {root["url"]}")
+                    print(root["text"])
+                print("Error : Could not locate article. This is a known issue that occasionally occurs. Please try to run the script again.")
+                sys.exit(1)
+
+            #grab the title
             title_regex = re.compile(r'css-(1p83fk8|3swi83) e1r8fcie0')
             title = soup.find('h1', {'class': title_regex})
             title = title.decode_contents()
 
+            #grab the subtitle
             subtitle_regex = re.compile(r'css-(1ms10sa|1ss9ydi) eg03uz0')
             subtitle_tag = soup.find('h2', {'class' : subtitle_regex})
      
@@ -322,23 +319,31 @@ def load_articles(sections):
             if subtitle_tag:
                 subtitle = subtitle_tag.decode_contents()
 
-            section_blurb_tag = soup.find('span', {'class':'css-rjcumh e1vi1cqp0'})
 
+
+            #check if there is a pre-section before the article (sometimes includes
+            #an image)
             pre_section_tag = soup.find('section', {'class':'css-1ugvd2u e18wk22u0'})
 
             pre_section_figure_tag = None
             if pre_section_tag:
                 pre_section_figure_tag = pre_section_tag.find('figure')
 
+            #List that contains the elements to create the page
             content = []
+
             if pre_section_figure_tag:
                 img_html = soup_img_from_figure(pre_section_figure_tag)
 
                 if img_html:
                     content.append(img_html)
 
+            #grab section blurb (may be None)
+            section_blurb_tag = soup.find('span', {'class':'css-rjcumh e1vi1cqp0'})
+
             section_blurb = None
             if section_blurb_tag:
+                #Need to clean it up
                 match = re.search(r'<!-- -->\s*(.*)', section_blurb_tag.decode_contents())
 
                 if match:
@@ -349,6 +354,8 @@ def load_articles(sections):
             for s in article.select('aside'):
                 s.extract()
 
+            #within article we look for <p data-component="paragraph", h3 (section headings)
+            #and figure which contains images
             tags = article.find_all(lambda tag: 
                      (tag.name == 'p' and tag.get('data-component') == 'paragraph') or 
                      tag.name == 'h2' or
@@ -356,31 +363,43 @@ def load_articles(sections):
 
             for idx, tag in enumerate(tags):
                 if tag.name == 'p':
-                    #content.append(tag.decode_contents())
+
+                    #clean to tags to remove unwanted tags / formatting
+                    #this modifies the tag
                     clean_tags(tag)
+
                     content.append(tag.decode_contents())
+
                 elif tag.name == 'h2':
                     content.append(f"<b>{tag.decode_contents()}</b>")
-                elif tag.name == 'figure':
-                    #img_tag = tag.find('img')
 
+                elif tag.name == 'figure':
+
+                    #extract the image tag from the figure
                     img_html = soup_img_from_figure(tag)
 
                     if img_html:
                         content.append(img_html)
 
+            #search for whether it contains an audio player with mp3 file we can
+            #use for the podcast xml
             audio = soup.find('audio')
 
             mp3 = None
             if audio:
                 mp3 = audio["src"]
 
+
+            #just use the last part of the url for the filename
+            file_name = f"{u.split('/')[-1]}.html"
+            dir = section['section']['slug'].strip('/')
+
             articles.append({
                 "title":title, 
                 "content":content,
                 "url":u,
-                "file_name": f"{u.split('/')[-1]}.html",
-                "dir": section['section']['slug'].strip('/'),
+                "file_name": file_name,
+                "dir": dir,
                 "mp3":mp3,
                 "subtitle":subtitle,
                 "section_blurb":section_blurb

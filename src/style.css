@@ -125,6 +125,13 @@ p a {
     text-decoration: none;
 }
 
+/*
+    this is for section titles in article. Use negative margin so to tweak the spacing
+    to bring it closer to the section its associated with. Otherwise the marging on that P
+    pushes it up
+
+    Basically P that contains a B
+*/
 p:has(> b) {
     margin-bottom: -25px;
 }
@@ -167,10 +174,6 @@ audio {
 
 figure {
     margin:0px;
-}
-
-.ed4dtdz0 {
-    display: none;
 }
 
 .section-list a:visited {

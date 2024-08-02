@@ -19,15 +19,19 @@ This project requires that you have access to the digital version of the Economi
 ## Images
 
 ### Desktop Browser
-<img src="images/desktop_1.png" width="300"> <img src="images/desktop_2.png" width="300">
+<img src="images/desktop_1.png" width="300"> <img src="images/desktop_2.png" width="300"> <img src="images/desktop_3.png" width="300">
 
 ### Mobile Browser
 
-<img src="images/mobile_1.jpg" height="300"> <img src="images/mobile_2.jpg" height="300">
+<img src="images/mobile_1.png" height="300">
 
 ### Mobile Podcast
 
-<img src="images/podcast_1.jpg" height="300"> <img src="images/podcast_2.jpg" height="300">
+<img src="images/podcast_1.png" height="300"> <img src="images/podcast_2.png" height="300"> <img src="images/podcast_3.png" height="300">
+
+### File Layout
+
+<img src="images/filelayout.png" height="300">
 
 
 ## Installation

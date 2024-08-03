@@ -217,6 +217,8 @@ def build_podcast(sections):
 # on the parsed data
 def build_sections(sections):
     
+    global VERSION
+
     if verbose:
         print(f"Generating article files")
 
@@ -268,7 +270,8 @@ def build_sections(sections):
             'economist_url': article["url"],
             'read_time': read_time,
             'subtitle': article["subtitle"],
-            'section_blurb': article["section_blurb"]
+            'section_blurb': article["section_blurb"],
+            'version': VERSION
         }
 
         output = template.render(context)
@@ -447,6 +450,7 @@ def soup_img_from_figure(tag):
 
 #build the main index.html page              
 def build_index(sections):
+    global VERSION
 
     if verbose:
         print(f"Generating index")
@@ -456,7 +460,8 @@ def build_index(sections):
     context = {
         "sections":sections,
         "title":edition_date,
-        "weekly_url":weekly_url
+        "weekly_url":weekly_url,
+        "version": VERSION
     }
 
     output = template.render(context)

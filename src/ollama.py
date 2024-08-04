@@ -2,41 +2,38 @@ import requests
 import json
 from requests import Session
 
-OLLAMA_URL = "http://localhost:11434/api/chat"
+class Ollama:
+    DEFAULT_BASE_URL = "http://localhost:11434"
+    DEFAULT_LLM = "llama3.1"
 
-session = None
-llm = "llama3.1"
-url = OLLAMA_URL
+    def __init__(self, llm=DEFAULT_LLM, base_url=DEFAULT_BASE_URL ):
+        self.session = None
+        self.llm = llm
+        self.base_url = base_url
+        self.init_session()
 
-def init_session():
-    global session
+    def init_session(self):
+        self.session = Session()
 
-    session = Session()
+    def prompt(self, prompt):
 
+        data = {
+            "model": self.llm,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            "stream": False,
+            "format": "json"
+        }
 
-def prompt(prompt, url = OLLAMA_URL):
+        headers = {
+            "Content-Type": "application/json"
+        }
 
-    data = {
-        "model": "llama3.1",
-        "messages": [
-            {
-                "role": "user",
-                "content": prompt
-
-            }
-        ],
-        "stream": False,
-        "format": "json"
-    }
-
-    headers = {
-        "Content-Type": "application/json"
-    }
-
-    response = None
-    if session:
-        response = session.post(url, headers = headers, json=data)
-    else:
-        response = requests.post(url, headers = headers, json=data)
-
-    return response.json()
+        url = f"{self.base_url}/api/chat"
+        response = self.session.post(url, headers=headers, json=data)
+        
+        return response.json()

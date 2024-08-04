@@ -4,12 +4,17 @@ Digest is a Python3 script that creates a local version of the weekly Economist 
 
 Specifically, it:
 
-* Creates a local archive of the weekly edition
-* Provides an optimized reading experience
-* Easy navigation between sections and articles
+* Creates a local archive of the weekly magazine / edition
+* Provides a optimized reading experience
+* Support for core article content, images and audio
+* Easily navigate between sections and articles
 * Ability to read offline
-* Ability to easy jump to articles on Economist website
-* Ability to listen to edition as a podcast, online or off
+* Reading is HTML based, so you can choose your reading client
+* Quickly jump to source articles on The Economist website
+* Generates an RSS feed for audio content that can be used to listen to weekly edition as a podcast in your favorite podcast client
+* Ability to sync and listen to the audio podcast offline
+* Support for article summaries via LLMs and Ollama
+
 
 The project was built to work around performance issues and limitation of the Economist website and mobile application. 
 
@@ -66,6 +71,36 @@ You can find a complete list of options by running:
 ```bash
 python3 digest.py --help
 ```
+## Generating Article Summaries using LLMs
+
+The script includes support for generating article summaries using large language models accessible via the Ollama API. The summaries are appended to the bottom of the articles.
+
+It has been tested with the following LLMs:
+* [Meta llama 3.1](https://llama.meta.com/)
+
+In order to use the feature you must either install [Ollama](https://ollama.com/) locally, and pull an LLM, or have a URL where the Ollama API can be accessed. By default, the script assumes a local installation on the default port (11434).
+
+To enable summaries, just pass the **--create-summary** flag:
+
+```bash
+python3 digest.py --output-dir ~/tmp/economist/ --create-summary
+```
+
+This will create summaries using a local Ollama API url, with the **llama3.1** model.
+
+You can specify a specific model via the **llm** argument:
+
+```bash
+python3 digest.py --output-dir ~/tmp/economist/ --create-summary --llm "llama3.1:70b"
+```
+
+Note, depending on the hardware configuration where Ollama runs, summary generation may take an extended amount of time, particularly with larger parameter models (such as llama 3.1 70b and 450b).
+
+Finally, if you want to use a remote Ollama server, you can specify the base URL for that via the **ollama-base-url** argument:
+
+```bash
+python3 digest.py --output-dir ~/tmp/economist/ --create-summary --ollama-base-url "https://mydomain.com:11434"
+```
 
 ## Using the Generated Podcast feed
 
@@ -84,6 +119,7 @@ Also, in order to add the URL to your podcasting app, you may need to host it on
 ## Known Issues
 
 * There's no support for Brave browser yet.
+* Release v0.85.2 does not generated entire digest
 
 ## Questions, Feature Requests, Feedback
 

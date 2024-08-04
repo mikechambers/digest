@@ -34,7 +34,7 @@ import uuid
 from bs4 import BeautifulSoup
 from jinja2 import Environment, FileSystemLoader
 
-import llama
+from ollama import Ollama
 
 
 BASE_URL = "https://www.economist.com"
@@ -52,8 +52,10 @@ user_agent = f"Digest/{VERSION}"
 verbose = False
 cookie_source = "firefox"
 create_summary = False
-ollama_url = None
-llm = None
+
+ollama = None
+ollama_base_url = Ollama.DEFAULT_BASE_URL
+llm = "llama3.1"
 
 SECTION_INFO = [
     {"title": "The World This Week", "slug": "/the-world-this-week/", "summarize":False},
@@ -78,10 +80,10 @@ SECTION_INFO = [
     {"title": "Obituary", "slug": "/obituary/", "summarize":True}
 ]
 
-SECTION_INFO = [
-    {"title": "The World This Week", "slug": "/the-world-this-week/", "summarize":False},
-    {"title": "Leaders", "slug": "/leaders/", "summarize":True},
-]
+#SECTION_INFO = [
+#    {"title": "The World This Week", "slug": "/the-world-this-week/", "summarize":False},
+#    {"title": "Leaders", "slug": "/leaders/", "summarize":True},
+#]
 
 session = None
 
@@ -293,7 +295,7 @@ def generate_summary(content):
     escaped_content = joined_content.replace('"', '\\"').replace('\n', '\\n')
 
     prompt = f"Summarize the main 3 points from the following article with one sentence each. The response should be as a valid JSON object in this form {{'summary':[]}} with each sentence one array each. Here is the article: {escaped_content}"
-    data = llama.prompt(prompt)
+    data = ollama.prompt(prompt)
 
     #print(data)
     import json
@@ -312,7 +314,6 @@ def generate_summary(content):
     return summary_list
 
 
-
 # Write the string data to the specified file / directory
 def write_file(dir, file_name, data):
 
@@ -329,6 +330,7 @@ def write_file(dir, file_name, data):
 
 # load and parse all of the articles
 def load_articles(sections):
+    global ollama
 
     if verbose:
         print("Retrieving articles")
@@ -336,9 +338,11 @@ def load_articles(sections):
     if create_summary:
 
         if verbose:
-            print("Initializing ollama session")
+            print("Initializing ollama session for summaries")
+            print(f"Ollama base url : {ollama_base_url}")
+            print(f"Using LLM : {llm}")
 
-        llama.init_session()
+        ollama = Ollama(llm = llm, base_url = ollama_base_url)
 
     for section in sections:
         articles = []
@@ -701,6 +705,22 @@ if __name__ == "__main__":
         help='The path to the directory that the digest will be created'
     )
 
+    parser.add_argument(
+        '--llm',
+        type=str,
+        dest="llm",
+        default=llm,
+        help=f'LLM to use if --create-summary is true. Default is {{llm}}'
+    )
+
+    parser.add_argument(
+        '--ollama-base-url',
+        type=str,
+        dest="ollama_base_url",
+        default = ollama_base_url,
+        help=f'Base url where ollama API can be accessed. Default is {{ollama_base_url}}'
+    )
+
     args = parser.parse_args()
 
     if not args.version and not args.output_dir:
@@ -720,6 +740,8 @@ if __name__ == "__main__":
     if args.reading_rate:
         reading_rate = args.reading_rate
 
+    llm = args.llm
+    ollama_base_url = args.ollama_base_url
     create_summary = args.create_summary
     verbose = args.verbose
     output_dir = args.output_dir

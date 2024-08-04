@@ -34,9 +34,12 @@ import uuid
 from bs4 import BeautifulSoup
 from jinja2 import Environment, FileSystemLoader
 
+import llama
+
+
 BASE_URL = "https://www.economist.com"
 WEEKLY_URL = f"{BASE_URL}/weeklyedition/"
-VERSION = "0.85.2"
+VERSION = "0.85.3"
 
 INDEX_TEMPLATE = "index.html"
 ARTICLE_TEMPLATE = "article.html"
@@ -48,34 +51,37 @@ STYLE_FILE = "style.css"
 user_agent = f"Digest/{VERSION}"
 verbose = False
 cookie_source = "firefox"
+create_summary = False
+ollama_url = None
+llm = None
 
 SECTION_INFO = [
-    {"title": "The World This Week", "slug": "/the-world-this-week/"},
-    {"title": "Leaders", "slug": "/leaders/"},
-    {"title": "Letters", "slug": "/letters/"},
-    {"title": "By Invitation", "slug": "/by-invitation/"},
-    {"title": "Briefing", "slug": "/briefing/"},
-    {"title": "United States", "slug": "/united-states/"},
-    {"title": "The Americas", "slug": "/the-americas/"},
-    {"title": "Asia", "slug": "/asia/"},
-    {"title": "China", "slug": "/china/"},
-    {"title": "Middle East and Africa", "slug": "/middle-east-and-africa/"},
-    {"title": "Europe", "slug": "/europe/"},
-    {"title": "Britain", "slug": "/britain/"},
-    {"title": "International", "slug": "/international/"},
-    {"title": "Special Report", "slug": "/special-report/"},
-    {"title": "Business", "slug": "/business/"},
-    {"title": "Finance and Economics", "slug": "/finance-and-economics/"},
-    {"title": "Science and Technology", "slug": "/science-and-technology/"},
-    {"title": "Culture", "slug": "/culture/"},
-    {"title": "Economic and Financial Indicators", "slug": "/economic-and-financial-indicators/"},
-    {"title": "Obituary", "slug": "/obituary/"}
+    {"title": "The World This Week", "slug": "/the-world-this-week/", "summarize":False},
+    {"title": "Leaders", "slug": "/leaders/", "summarize":False},
+    {"title": "Letters", "slug": "/letters/", "summarize":False},
+    {"title": "By Invitation", "slug": "/by-invitation/", "summarize":True},
+    {"title": "Briefing", "slug": "/briefing/", "summarize":True},
+    {"title": "United States", "slug": "/united-states/", "summarize":True},
+    {"title": "The Americas", "slug": "/the-americas/", "summarize":True},
+    {"title": "Asia", "slug": "/asia/", "summarize":True},
+    {"title": "China", "slug": "/china/", "summarize":True},
+    {"title": "Middle East and Africa", "slug": "/middle-east-and-africa/", "summarize":True},
+    {"title": "Europe", "slug": "/europe/", "summarize":True},
+    {"title": "Britain", "slug": "/britain/", "summarize":True},
+    {"title": "International", "slug": "/international/", "summarize":True},
+    {"title": "Special Report", "slug": "/special-report/", "summarize":True},
+    {"title": "Business", "slug": "/business/", "summarize":True},
+    {"title": "Finance and Economics", "slug": "/finance-and-economics/", "summarize":True},
+    {"title": "Science and Technology", "slug": "/science-and-technology/", "summarize":True},
+    {"title": "Culture", "slug": "/culture/", "summarize":True},
+    {"title": "Economic and Financial Indicators", "slug": "/economic-and-financial-indicators/", "summarize":False},
+    {"title": "Obituary", "slug": "/obituary/", "summarize":True}
 ]
 
-#SECTION_INFO = [
-#    {"title": "The World This Week", "slug": "/the-world-this-week/"},
-#    {"title": "Leaders", "slug": "/leaders/"},
-#]
+SECTION_INFO = [
+    {"title": "The World This Week", "slug": "/the-world-this-week/", "summarize":False},
+    {"title": "Leaders", "slug": "/leaders/", "summarize":True},
+]
 
 session = None
 
@@ -237,6 +243,7 @@ def build_sections(sections):
         article = items[i]["article"]
         section = items[i]["section"]
         content = article['content']
+        summary = article['summary']
         title = article['title']
         
         prev_title = "Index"
@@ -271,13 +278,39 @@ def build_sections(sections):
             'read_time': read_time,
             'subtitle': article["subtitle"],
             'section_blurb': article["section_blurb"],
-            'version': VERSION
+            'version': VERSION,
+            'summary': summary
         }
 
         output = template.render(context)
     
         #write out the article
         write_file(article["dir"], article["file_name"], output)
+
+
+def generate_summary(content):
+    joined_content = " ".join(content)
+    escaped_content = joined_content.replace('"', '\\"').replace('\n', '\\n')
+
+    prompt = f"Summarize the main 3 points from the following article with one sentence each. The response should be as a valid JSON object in this form {{'summary':[]}} with each sentence one array each. Here is the article: {escaped_content}"
+    data = llama.prompt(prompt)
+
+    #print(data)
+    import json
+
+    summary_list = None
+    try:
+        content_str = data['message']['content']
+        content_data = json.loads(content_str)
+        summary_list = content_data['summary']
+    except Exception as e:
+        if verbose:
+            print(data)
+
+        raise
+
+    return summary_list
+
 
 
 # Write the string data to the specified file / directory
@@ -298,7 +331,14 @@ def write_file(dir, file_name, data):
 def load_articles(sections):
 
     if verbose:
-        print(f"Retrieving articles")
+        print("Retrieving articles")
+
+    if create_summary:
+
+        if verbose:
+            print("Initializing ollama session")
+
+        llama.init_session()
 
     for section in sections:
         articles = []
@@ -396,6 +436,16 @@ def load_articles(sections):
                     if img_html:
                         content.append(img_html)
 
+            summary = None
+            if create_summary:
+                if section["section"]["summarize"]:
+
+                    if verbose:
+                        print(f"Generating summary for : {title}")
+
+                    summary = generate_summary(content)
+
+
             #search for whether it contains an audio player with mp3 file we can
             #use for the podcast xml
             audio = soup.find('audio')
@@ -404,7 +454,6 @@ def load_articles(sections):
             if audio:
                 mp3 = audio["src"]
 
-
             #just use the last part of the url for the filename
             file_name = f"{u.split('/')[-1]}.html"
             dir = section['section']['slug'].strip('/')
@@ -412,6 +461,7 @@ def load_articles(sections):
             articles.append({
                 "title":title, 
                 "content":content,
+                "summary":summary,
                 "url":u,
                 "file_name": file_name,
                 "dir": dir,
@@ -614,6 +664,13 @@ if __name__ == "__main__":
         action='store_true', 
         help='display additional information as script runs'
     )
+
+    parser.add_argument(
+        '--create-summary',
+        dest='create_summary', 
+        action='store_true', 
+        help='Use ollama and an llm to create a summary for articles. Requires that an ollama server is running.'
+    )
     
     parser.add_argument(
         "--user-agent",
@@ -663,6 +720,7 @@ if __name__ == "__main__":
     if args.reading_rate:
         reading_rate = args.reading_rate
 
+    create_summary = args.create_summary
     verbose = args.verbose
     output_dir = args.output_dir
 

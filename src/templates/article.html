@@ -53,6 +53,16 @@
         {% endfor %}
     </div>
     
+    {% if summary %}
+        <div><b>Summary</b></div>
+        <ul>
+        {% for s in summary %}
+        <li>{{s}}</li>
+        {% endfor %}
+        </ul>
+        
+    {% endif %}
+
     <div class="footer">
         <div><a href="{{prev_url}}">{{prev_title}}</a></div>
         <div class="footer_right"><a href="{{next_url}}">{{next_title}}</a></div>

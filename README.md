@@ -13,7 +13,7 @@ Specifically, it:
 * Quickly jump to source articles on The Economist website
 * Generates an RSS feed for audio content that can be used to listen to weekly edition as a podcast in your favorite podcast client
 * Ability to sync and listen to the audio podcast offline
-* Support for article summaries via LLMs and Ollama
+* Support for article summary generation via LLMs and Ollama
 
 
 The project was built to work around performance issues and limitation of the Economist website and mobile application. 
@@ -102,6 +102,8 @@ Finally, if you want to use a remote Ollama server, you can specify the base URL
 python3 digest.py --output-dir ~/tmp/economist/ --create-summary --ollama-base-url "https://mydomain.com:11434"
 ```
 
+Note, depending on the LLM model used for summaries, summary generation may randomly fail on a per article basis. You can pass **--ignore-llm-error** to skip on error, in which case a summary for that article will not be generated. Larger parameter models should be more consistent.
+
 ## Using the Generated Podcast feed
 
 An XML file will be generated that creates a podcast from the mp3 files for the current weekly edition. It is generated in serial mode with the order of the episodes based on the order of the articles online.
@@ -118,6 +120,7 @@ Also, in order to add the URL to your podcasting app, you may need to host it on
 
 ## Known Issues
 
+* Depending on the LLM model used for summaries, summary generation may randomly fail on a per article basis. You can pass **--ignore-llm-error** to skip on error, in which case a summary for that article will not be generated. Larger parameter models should be more consistent.
 * There's no support for Brave browser yet.
 * Release v0.85.2 does not generated entire digest
 

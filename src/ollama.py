@@ -26,7 +26,8 @@ class Ollama:
                 }
             ],
             "stream": False,
-            "format": "json"
+            "format": "json",
+            "temperature": 0,
         }
 
         headers = {
@@ -35,5 +36,5 @@ class Ollama:
 
         url = f"{self.base_url}/api/chat"
         response = self.session.post(url, headers=headers, json=data)
-        
+
         return response.json()

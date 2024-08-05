@@ -24,7 +24,7 @@ This project requires that you have access to the digital version of the Economi
 ## Images
 
 ### Desktop Browser
-<img src="images/desktop_1.png" width="300"> <img src="images/desktop_2.png" width="300"> <img src="images/desktop_3.png" width="300">
+<img src="images/desktop_1.png" width="300"> <img src="images/desktop_2.png" width="300"> <img src="images/desktop_3.png" width="300"> <img src="images/desktop_4.png" width="300">
 
 ### Mobile Browser
 

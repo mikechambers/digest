@@ -81,10 +81,10 @@ SECTION_INFO = [
     {"title": "Obituary", "slug": "/obituary/", "summarize":True}
 ]
 
-SECTION_INFO = [
+#SECTION_INFO = [
 #    {"title": "The World This Week", "slug": "/the-world-this-week/", "summarize":False},
-    {"title": "Leaders", "slug": "/leaders/", "summarize":True},
-]
+#    {"title": "Leaders", "slug": "/leaders/", "summarize":True},
+#]
 
 session = None
 

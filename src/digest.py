@@ -81,10 +81,10 @@ SECTION_INFO = [
     {"title": "Obituary", "slug": "/obituary/", "summarize":True}
 ]
 
-#SECTION_INFO = [
+SECTION_INFO = [
 #    {"title": "The World This Week", "slug": "/the-world-this-week/", "summarize":False},
-#    {"title": "Leaders", "slug": "/leaders/", "summarize":True},
-#]
+    {"title": "Leaders", "slug": "/leaders/", "summarize":True},
+]
 
 session = None
 
@@ -247,6 +247,7 @@ def build_sections(sections):
         section = items[i]["section"]
         content = article['content']
         summary = article['summary']
+        relevance = article['relevance']
         title = article['title']
         
         prev_title = "Index"
@@ -282,7 +283,8 @@ def build_sections(sections):
             'subtitle': article["subtitle"],
             'section_blurb': article["section_blurb"],
             'version': VERSION,
-            'summary': summary
+            'summary': summary,
+            'relevance':relevance
         }
 
         output = template.render(context)
@@ -296,14 +298,19 @@ def generate_summary(content):
     escaped_content = joined_content.replace('"', '\\"').replace('\n', '\\n')
 
     prompt = f"""
-        Summarize the main 3 points from the following article with one sentence each.
+        Given the following article in between [BEGIN ARTICLE CONTENT] and [END ARTICLE CONTENT] below, please do two things:
+
+        1. Provide a single, succinct sentence on what the main point of the article is and why it is important.
+        2. Summarize the main 3 points from the article with one sentence each.
+
         The response should be a single valid JSON object in this form:
             {{'summary':
                 [
                     'this is the first summary point',
                     'this is the second summary point',
                     'this is the third summary point'
-                ]
+                ],
+                'relevance': "main point of article and why it is important"
             }}
             Each array entry should contain a single summary point.
             
@@ -319,10 +326,12 @@ def generate_summary(content):
     data = ollama.prompt(prompt)
 
     summary_list = None
+    relevance = None
     try:
         content_str = data['message']['content']
         content_data = json.loads(content_str)
         summary_list = content_data['summary']
+        relevance = content_data['relevance']
     except Exception as e:
 
         error = data.get("error")
@@ -336,7 +345,7 @@ def generate_summary(content):
         if not ignore_llm_error:
             raise
 
-    return summary_list
+    return {"summary":summary_list, "relevance":relevance}
 
 
 # Write the string data to the specified file / directory
@@ -466,13 +475,18 @@ def load_articles(sections):
                         content.append(img_html)
 
             summary = None
+            relevance = None
             if create_summary:
                 if section["section"]["summarize"]:
 
                     if verbose:
                         print(f"Generating summary for : {title}")
 
-                    summary = generate_summary(content)
+                    overview = generate_summary(content)
+
+                    if overview:
+                        summary = overview["summary"]
+                        relevance = overview["relevance"]
 
 
             #search for whether it contains an audio player with mp3 file we can
@@ -491,6 +505,7 @@ def load_articles(sections):
                 "title":title, 
                 "content":content,
                 "summary":summary,
+                "relevance":relevance,
                 "url":u,
                 "file_name": file_name,
                 "dir": dir,

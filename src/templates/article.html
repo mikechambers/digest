@@ -54,12 +54,17 @@
     </div>
     
     {% if summary %}
-        <div><b>Summary</b></div>
-        <ul>
-        {% for s in summary %}
-        <li>{{s}}</li>
-        {% endfor %}
-        </ul>
+        <div><b>Overview</b></div>
+        {% if relevance %}
+        <p>{{relevance}}</p>
+        {% endif %}
+        <div>
+            <ul>
+            {% for s in summary %}
+            <li>{{s}}</li>
+            {% endfor %}
+            </ul>
+    </div>
         
     {% endif %}
 

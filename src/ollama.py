@@ -39,6 +39,6 @@ class Ollama:
         }
 
         url = f"{self.base_url}/api/chat"
-        response = self.session.post(url, headers=headers, json=data, timeout=API_TIMEOUT)
+        response = self.session.post(url, headers=headers, json=data, timeout = self.API_TIMEOUT)
 
         return response.json()

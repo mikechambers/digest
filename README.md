@@ -8,12 +8,12 @@ Specifically, it:
 * Provides a optimized reading experience
 * Support for core article content, images and audio
 * Easily navigate between sections and articles
-* Ability to read offline
+* Has ability to be read offline
 * Reading is HTML based, so you can choose your reading client
 * Quickly jump to source articles on The Economist website
 * Generates an RSS feed for audio content that can be used to listen to weekly edition as a podcast in your favorite podcast client
-* Ability to sync and listen to the audio podcast offline
-* Support for article summary generation via LLMs and Ollama
+* Has ability to sync and listen to the audio podcast offline
+* Has support for article summary generation via LLMs and Ollama
 
 
 The project was built to work around performance issues and limitation of the Economist website and mobile application. 
@@ -123,7 +123,7 @@ Also, in order to add the URL to your podcasting app, you may need to host it on
 ## Known Issues
 
 * There's no support for Brave browser yet.
-* Release v0.85.2 does not generated entire digest
+* Release v0.85.2 does not generate entire digest
 
 ## Questions, Feature Requests, Feedback
 

@@ -60,7 +60,7 @@ llm = "llama3.1"
 
 SECTION_INFO = [
     {"title": "The World This Week", "slug": "/the-world-this-week/", "summarize":False},
-    {"title": "Leaders", "slug": "/leaders/", "summarize":False},
+    {"title": "Leaders", "slug": "/leaders/", "summarize":True},
     {"title": "Letters", "slug": "/letters/", "summarize":False},
     {"title": "By Invitation", "slug": "/by-invitation/", "summarize":True},
     {"title": "Briefing", "slug": "/briefing/", "summarize":True},
@@ -248,8 +248,6 @@ def build_sections(sections):
         content = article['content']
         summary = article['summary']
         title = article['title']
-
-        print(summary)
         
         prev_title = "Index"
         prev_url = "../index.html"
@@ -303,7 +301,7 @@ def generate_summary(content):
             {{'summary':
                 [
                     'this is the first summary point',
-                    'this is the second summary point'
+                    'this is the second summary point',
                     'this is the third summary point'
                 ]
             }}

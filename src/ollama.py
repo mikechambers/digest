@@ -5,6 +5,7 @@ from requests import Session
 class Ollama:
     DEFAULT_BASE_URL = "http://localhost:11434"
     DEFAULT_LLM = "llama3.1"
+    API_TIMEOUT = 300
 
     def __init__(self, llm=DEFAULT_LLM, base_url=DEFAULT_BASE_URL ):
         self.session = None
@@ -28,6 +29,9 @@ class Ollama:
             "stream": False,
             "format": "json",
             "temperature": 0,
+            "options" : {
+                "num_ctx": 4096
+            }
         }
 
         headers = {
@@ -35,6 +39,6 @@ class Ollama:
         }
 
         url = f"{self.base_url}/api/chat"
-        response = self.session.post(url, headers=headers, json=data)
+        response = self.session.post(url, headers=headers, json=data, timeout=API_TIMEOUT)
 
         return response.json()

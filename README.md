@@ -94,15 +94,15 @@ You can specify a specific model via the **llm** argument:
 python3 digest.py --output-dir ~/tmp/economist/ --create-summary --llm "llama3.1:70b"
 ```
 
-Note, depending on the hardware configuration where Ollama runs, summary generation may take an extended amount of time, particularly with larger parameter models (such as llama 3.1 70b and 450b).
+Depending on the hardware configuration where Ollama runs, summary generation may take an extended amount of time, particularly with larger parameter models (such as llama 3.1 70b and 450b).
 
-Finally, if you want to use a remote Ollama server, you can specify the base URL for that via the **ollama-base-url** argument:
+If you want to use a remote Ollama server, you can specify the base URL for that via the **ollama-base-url** argument:
 
 ```bash
 python3 digest.py --output-dir ~/tmp/economist/ --create-summary --ollama-base-url "https://mydomain.com:11434"
 ```
 
-Note, depending on the LLM model used for summaries, summary generation may randomly fail on a per article basis. You can pass **--ignore-llm-error** to skip on error, in which case a summary for that article will not be generated. Creating and or using models with a minimum num_ctx or 4096 should solve the issue.
+Note, depending on the LLM model used for summaries, summary generation may randomly fail on a per article basis. You can pass **--ignore-llm-error** to skip on error, in which case a summary for that article will not be generated. Creating and or using models with a minimum num_ctx of 4096 or higher should solve the issue.
 
 More info [here](https://github.com/ollama/ollama/blob/main/docs/modelfile.md).
 

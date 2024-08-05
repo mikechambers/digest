@@ -102,7 +102,9 @@ Finally, if you want to use a remote Ollama server, you can specify the base URL
 python3 digest.py --output-dir ~/tmp/economist/ --create-summary --ollama-base-url "https://mydomain.com:11434"
 ```
 
-Note, depending on the LLM model used for summaries, summary generation may randomly fail on a per article basis. You can pass **--ignore-llm-error** to skip on error, in which case a summary for that article will not be generated. Larger parameter models should be more consistent.
+Note, depending on the LLM model used for summaries, summary generation may randomly fail on a per article basis. You can pass **--ignore-llm-error** to skip on error, in which case a summary for that article will not be generated. Creating and or using models with a minimum num_ctx or 4096 should solve the issue.
+
+More info [here](https://github.com/ollama/ollama/blob/main/docs/modelfile.md).
 
 ## Using the Generated Podcast feed
 
@@ -120,7 +122,6 @@ Also, in order to add the URL to your podcasting app, you may need to host it on
 
 ## Known Issues
 
-* Depending on the LLM model used for summaries, summary generation may randomly fail on a per article basis. You can pass **--ignore-llm-error** to skip on error, in which case a summary for that article will not be generated. Larger parameter models should be more consistent.
 * There's no support for Brave browser yet.
 * Release v0.85.2 does not generated entire digest
 

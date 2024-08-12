@@ -76,6 +76,7 @@ SECTION_INFO = [
     {"title": "Business", "slug": "/business/", "summarize":True},
     {"title": "Finance and Economics", "slug": "/finance-and-economics/", "summarize":True},
     {"title": "Science and Technology", "slug": "/science-and-technology/", "summarize":True},
+    {"title": "Schools Brief", "slug": "/schools-brief/", "summarize":True},
     {"title": "Culture", "slug": "/culture/", "summarize":True},
     {"title": "Economic and Financial Indicators", "slug": "/economic-and-financial-indicators/", "summarize":False},
     {"title": "Obituary", "slug": "/obituary/", "summarize":True}

@@ -15,7 +15,6 @@ Specifically, it:
 * Has ability to sync and listen to the audio podcast offline
 * Has support for article summary generation via LLMs and Ollama
 
-
 The project was built to work around performance issues and limitation of the Economist website and mobile application. 
 
 This project requires that you have access to the digital version of the Economist, and is not affiliated with or supported by The Economist.

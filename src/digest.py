@@ -299,6 +299,8 @@ def generate_summary(content):
     escaped_content = joined_content.replace('"', '\\"').replace('\n', '\\n')
 
     prompt = f"""
+        You are a copywriter for The Economist magazine, and are tasks with summarizing articles.
+        
         Given the following article in between [BEGIN ARTICLE CONTENT] and [END ARTICLE CONTENT] below, please do two things:
 
         1. Provide a single, succinct sentence on what the main point of the article is and why it is important.

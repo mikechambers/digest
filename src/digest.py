@@ -403,7 +403,7 @@ def load_articles(sections):
                 sys.exit(1)
 
             #grab the title
-            title_regex = re.compile(r'css-(1p83fk8|3swi83) e1r8fcie0')
+            title_regex = re.compile(r'css-(1p83fk8|3swi83|1xjnja3) e1r8fcie0')
             title = soup.find('h1', {'class': title_regex})
             title = title.decode_contents()
 
@@ -453,7 +453,7 @@ def load_articles(sections):
             #within article we look for <p data-component="paragraph", h3 (section headings)
             #and figure which contains images
             tags = article.find_all(lambda tag: 
-                     (tag.name == 'p' and tag.get('data-component') == 'paragraph') or 
+                     (tag.name == 'p' and tag.get('data-component') in ['paragraph', 'falseparagraph']) or 
                      tag.name == 'h2' or
                      tag.name == 'figure')
 

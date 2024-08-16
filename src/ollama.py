@@ -6,6 +6,7 @@ class Ollama:
     DEFAULT_BASE_URL = "http://localhost:11434"
     DEFAULT_LLM = "llama3.1"
     API_TIMEOUT = 300
+    NUM_CTX = 8192
 
     def __init__(self, llm=DEFAULT_LLM, base_url=DEFAULT_BASE_URL ):
         self.session = None
@@ -30,7 +31,7 @@ class Ollama:
             "format": "json",
             "temperature": 0,
             "options" : {
-                "num_ctx": 4096
+                "num_ctx": self.NUM_CTX
             }
         }
 

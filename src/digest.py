@@ -172,6 +172,8 @@ def build_podcast(sections):
     items = []
     index = 1
 
+    build_date = now.strftime('%a, %d %b %Y %H:%M:%S GMT')
+
     for section in sections:
         for article in section["articles"]:
 

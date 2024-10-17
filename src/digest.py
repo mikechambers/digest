@@ -419,12 +419,16 @@ def load_articles(sections):
                 sys.exit(1)
 
             #grab the title
-            title_regex = re.compile(r'css-(1p83fk8|3swi83|1xjnja3) e1r8fcie0')
+            #used to grab like this, but the tags would be keep changing
+            #replace with what we have now
+            #title_regex = re.compile(r'css-(1p83fk8|3swi83|1xjnja3) e1r8fcie0')
+            title_regex = re.compile(r'e1r8fcie0')
             title = soup.find('h1', {'class': title_regex})
             title = title.decode_contents()
 
             #grab the subtitle
-            subtitle_regex = re.compile(r'css-(1ms10sa|1ss9ydi) eg03uz0')
+            #subtitle_regex = re.compile(r'css-(1ms10sa|1ss9ydi) eg03uz0')
+            subtitle_regex = re.compile(r'eg03uz0')
             subtitle_tag = soup.find('h2', {'class' : subtitle_regex})
      
             subtitle = ""

@@ -29,9 +29,21 @@
 <body>
 
     <div class="top">
+        
+        <div id="section_progress_container">
+            {% for i in range(article_section_total) %}
+                {% if i < article_section_index %}
+                    <div id="section_bar_full"></div>
+                {% else %}
+                    <div id="section_bar_empty"></div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
         <div id="progress_container">
             <div id="progress_bar"></div>
         </div>
+
         <div class="header">
             <div><a href="../index.html">Index</a></div>
             <div><a href="{{economist_url}}">Read on Economist.com</a></div>

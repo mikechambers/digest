@@ -199,6 +199,9 @@ figure {
     width:90%;
     max-width: var(--max-width);
     padding-top: 2px;
+    display:flex;
+    flex-direction: column;
+    gap:2px
 }
 
 #progress_bar {
@@ -210,6 +213,29 @@ figure {
 #progress_container {
     width: 100%;
     height: 5px;
+    background-color: #e0e0e0;
+}
+
+#section_progress_container {
+    width: 100%;
+    height: 5px;
+    display : flex;
+    flex-direction: row;
+    gap:2px;
+}
+
+#section_progress_container div {
+    flex-grow: 1;  /* Each div will take up an equal portion of the width */
+    height: 100%;
+}
+
+#section_bar_full {
+    height:100%;
+    background-color: #a0a0a0;
+}
+
+#section_bar_empty {
+    height:100%;
     background-color: #e0e0e0;
 }
 

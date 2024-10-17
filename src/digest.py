@@ -39,7 +39,7 @@ from ollama import Ollama
 
 BASE_URL = "https://www.economist.com"
 WEEKLY_URL = f"{BASE_URL}/weeklyedition/"
-VERSION = "0.85.3"
+VERSION = "0.85.4"
 
 INDEX_TEMPLATE = "index.html"
 ARTICLE_TEMPLATE = "article.html"
@@ -82,10 +82,10 @@ SECTION_INFO = [
     {"title": "Obituary", "slug": "/obituary/", "summarize":True}
 ]
 
-#SECTION_INFO = [
-#    {"title": "The World This Week", "slug": "/the-world-this-week/", "summarize":False},
-#    {"title": "Leaders", "slug": "/leaders/", "summarize":True},
-#]
+SECTION_INFO = [
+    {"title": "The World This Week", "slug": "/the-world-this-week/", "summarize":False},
+    {"title": "Leaders", "slug": "/leaders/", "summarize":True},
+]
 
 session = None
 
@@ -250,8 +250,12 @@ def build_sections(sections):
         section = items[i]["section"]
         content = article['content']
         summary = article['summary']
+        article_section_index = article['article_section_index']
+        article_section_total = article['article_section_total']
         relevance = article['relevance']
         title = article['title']
+
+        print(f"{article_section_index} / {article_section_total}")
         
         prev_title = "Index"
         prev_url = "../index.html"
@@ -287,7 +291,9 @@ def build_sections(sections):
             'section_blurb': article["section_blurb"],
             'version': VERSION,
             'summary': summary,
-            'relevance':relevance
+            'relevance':relevance,
+            'article_section_index':article_section_index,
+            'article_section_total':article_section_total
         }
 
         output = template.render(context)
@@ -383,7 +389,13 @@ def load_articles(sections):
 
         ollama = Ollama(llm = llm, base_url = ollama_base_url)
 
+    
+    
     for section in sections:
+
+        article_section_total = len(section["urls"])
+        article_section_index = 1
+
         articles = []
         for u in section["urls"]:
             u = f"{BASE_URL}{u}"
@@ -516,8 +528,14 @@ def load_articles(sections):
                 "dir": dir,
                 "mp3":mp3,
                 "subtitle":subtitle,
-                "section_blurb":section_blurb
+                "section_blurb":section_blurb,
+                "article_section_index":article_section_index,
+                "article_section_total":article_section_total
             })
+            article_section_index += 1
+
+            
+
 
         section["articles"] = articles
 

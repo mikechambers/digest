@@ -29,10 +29,12 @@
 <body>
 
     <div class="top">
-        
+
         <div id="section_progress_container">
             {% for i in range(article_section_total) %}
-                {% if i < article_section_index %}
+                {% if i == article_section_index - 1 %}
+                    <div id="section_bar_current"></div>
+                {% elif i < article_section_index %}
                     <div id="section_bar_full"></div>
                 {% else %}
                     <div id="section_bar_empty"></div>

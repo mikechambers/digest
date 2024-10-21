@@ -234,6 +234,11 @@ figure {
     background-color: #a0a0a0;
 }
 
+#section_bar_current {
+    height:100%;
+    background-color: #c0c0c0;
+}
+
 #section_bar_empty {
     height:100%;
     background-color: #e0e0e0;

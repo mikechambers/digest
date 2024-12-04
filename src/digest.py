@@ -84,10 +84,10 @@ SECTION_INFO = [
 
 """
 SECTION_INFO = [
-    {"title": "The World This Week", "slug": "/the-world-this-week/", "summarize":False},
-    {"title": "Leaders", "slug": "/leaders/", "summarize":True},
+    {"title": "Culture", "slug": "/culture/", "summarize":True},
 ]
 """
+
 
 session = None
 
@@ -340,6 +340,7 @@ def generate_summary(content):
 
     summary_list = None
     relevance = None
+
     try:
         content_str = data['message']['content']
         content_data = json.loads(content_str)
@@ -357,6 +358,8 @@ def generate_summary(content):
 
         if not ignore_llm_error:
             raise
+        else:
+            print(f"Error generating summary from LLM. Ignoring")
 
     return {"summary":summary_list, "relevance":relevance}
 

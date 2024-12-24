@@ -79,7 +79,10 @@ SECTION_INFO = [
     {"title": "Schools Brief", "slug": "/schools-brief/", "summarize":True},
     {"title": "Culture", "slug": "/culture/", "summarize":True},
     {"title": "Economic and Financial Indicators", "slug": "/economic-and-financial-indicators/", "summarize":False},
-    {"title": "Obituary", "slug": "/obituary/", "summarize":True}
+    {"title": "Obituary", "slug": "/obituary/", "summarize":True},
+    {"title": "Christmas Special", "slug": "/christmas-specials/", "summarize":True}
+
+    
 ]
 
 """

@@ -1,5 +1,5 @@
-# Copyright (c) 2024 Mike Chambers
-# https://github.com/mikechambers/dispatch
+# Copyright (c) 2025 Mike Chambers
+# https://github.com/mikechambers/digest
 #
 # MIT License
 #
@@ -810,7 +810,7 @@ if __name__ == "__main__":
 
     if args.version:
         print(f"Digest version : {VERSION}")
-        print("https://github.com/mikechambers/dispatch")
+        print("https://github.com/mikechambers/digest")
         sys.exit()
 
     if args.user_agent:

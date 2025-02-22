@@ -428,7 +428,9 @@ def load_articles(sections):
             #used to grab like this, but the tags would be keep changing
             #replace with what we have now
             #title_regex = re.compile(r'css-(1p83fk8|3swi83|1xjnja3) e1r8fcie0')
-            title_regex = re.compile(r'e1r8fcie0')
+            #title_regex = re.compile(r'e1r8fcie0')
+            title_regex = re.compile(r'e1c1hwj10|e1r8fcie0')
+            
             title = soup.find('h1', {'class': title_regex})
             title = title.decode_contents()
 

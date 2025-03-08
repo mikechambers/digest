@@ -412,17 +412,22 @@ def load_articles(sections):
             soup = BeautifulSoup(root["text"], 'html.parser')
             
             #find root of article. usually cp2, but sometimes cp1
-            article_regex = re.compile(r'cp[12]')
-            article = soup.find('section', {'data-body-id': article_regex})
+            #article_regex = re.compile(r'cp[12]')
+            #article = soup.find('section', {'data-body-id': article_regex})
+
+            article = soup.find('article', id='new-article-template')
+
+            #article = soup.find('section', {'data-test-id': "Article"})
             #article = soup.find('section', {'data-body-id': 'cp2'})
 
             #if still none then we bail out
             if article is None:
                 if verbose:
                     print(f"URL : {root["url"]}")
-                    print(root["text"])
+                    #print(root["text"])
                 print("Error : Could not locate article. This is a known issue that occasionally occurs. Please try to run the script again.")
                 sys.exit(1)
+    
 
             #grab the title
             #used to grab like this, but the tags would be keep changing

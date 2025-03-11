@@ -87,9 +87,10 @@ SECTION_INFO = [
 
 """
 SECTION_INFO = [
-    {"title": "Culture", "slug": "/culture/", "summarize":True},
+    {"title": "United States", "slug": "/united-states/", "summarize":True},
 ]
 """
+
 
 
 session = None
@@ -416,6 +417,18 @@ def load_articles(sections):
             #article = soup.find('section', {'data-body-id': article_regex})
 
             article = soup.find('article', id='new-article-template')
+
+            #clean up content after article
+            for div in article.find_all('div', attrs={'data-optimizely': 'related-articles-section'}):
+                div.decompose()
+
+            for div in article.select("div.css-ra48xw.ei4jjge0"):
+                div.decompose()
+
+            for div in article.find_all('div', attrs={'data-tracking-id': 'content-well-chapter-list'}):
+                div.decompose()
+
+
 
             #article = soup.find('section', {'data-test-id': "Article"})
             #article = soup.find('section', {'data-body-id': 'cp2'})

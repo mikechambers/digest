@@ -103,11 +103,14 @@ weekly_url = None
 reading_rate = 250
 
 env = None
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
 def main():
     global output_dir, env
 
-    env = Environment(loader=FileSystemLoader('templates'))
+    #env = Environment(loader=FileSystemLoader('templates'))
+    templates_dir = os.path.join(script_dir, "templates")
+    env = Environment(loader=FileSystemLoader(templates_dir))
 
     # get absolute path to output directory
     output_dir = os.path.abspath(output_dir)
@@ -134,10 +137,13 @@ def main():
     build_sections(sections)
     build_podcast(sections)
 
+
     if verbose:
         print(f"Copying CSS file")
+
+    style_file_path = os.path.join(script_dir, STYLE_FILE)
     shutil.copy2(
-        os.path.abspath(STYLE_FILE),
+        os.path.abspath(style_file_path),
         os.path.join(output_dir, STYLE_FILE)
     )
 

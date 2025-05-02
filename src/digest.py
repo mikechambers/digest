@@ -204,13 +204,13 @@ def build_podcast(sections):
                 minute -= 1
             
             items.append({
-                "title" : f"{section["section"]["title"]} : {article["title"]}",
-                "description":article["subtitle"] or "",
-                "mp3" : mp3,
-                "build_date" : build_date,
-                "index" : index,
-                "url" : article["url"],
-                "uuid" : uuid.uuid4()
+                "title": f"{section['section']['title']} : {article['title']}",
+                "description": article["subtitle"] or "",
+                "mp3": mp3,
+                "build_date": build_date,
+                "index": index,
+                "url": article["url"],
+                "uuid": uuid.uuid4()
             })
 
             index += 1
@@ -280,11 +280,11 @@ def build_sections(sections):
 
         if prev_article:
             prev_title = prev_article["title"]
-            prev_url = f"../{prev_article["dir"]}/{prev_article["file_name"]}"
+            prev_url = f"../{prev_article['dir']}/{prev_article['file_name']}"
 
         if next_article:
             next_title = next_article["title"]
-            next_url = f"../{next_article["dir"]}/{next_article["file_name"]}"
+            next_url = f"../{next_article['dir']}/{next_article['file_name']}"
 
         #figure out how long it will take to read the article
         read_time = readtime.of_html(''.join(content), wpm=reading_rate)
@@ -442,7 +442,7 @@ def load_articles(sections):
             #if still none then we bail out
             if article is None:
                 if verbose:
-                    print(f"URL : {root["url"]}")
+                    print(f"URL : {root['url']}")
                     #print(root["text"])
                 print("Error : Could not locate article. This is a known issue that occasionally occurs. Please try to run the script again.")
                 sys.exit(1)
@@ -651,9 +651,8 @@ def parse_sections():
 
     article_count = 0
     for section in SECTION_INFO:
-        pattern = fr'href="({section['slug']}[^\"]+)"'
+        pattern = fr'href="({section["slug"]}[^\"]+)"'
         found_urls = re.findall(pattern, weekly["text"])
-
         #remove duplicates
         #found_urls = list(set(found_urls))
         found_urls = remove_duplicate_strings(found_urls)
@@ -814,7 +813,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        '--llm',
+        '--model',
         type=str,
         dest="llm",
         default=llm,
@@ -822,11 +821,11 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        '--ollama-base-url',
+        '--host',
         type=str,
         dest="ollama_base_url",
         default = ollama_base_url,
-        help=f'Base url where ollama API can be accessed. Default is {{ollama_base_url}}'
+        help=f'url where ollama API can be accessed. Default is {{ollama_base_url}}'
     )
 
     args = parser.parse_args()

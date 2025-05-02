@@ -267,7 +267,7 @@ wheels = [
 
 [[package]]
 name = "digest"
-version = "0.85.1"
+version = "0.85.5"
 source = { virtual = "." }
 dependencies = [
     { name = "argparse" },

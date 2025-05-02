@@ -40,7 +40,7 @@ import time
 
 BASE_URL = "https://www.economist.com"
 WEEKLY_URL = f"{BASE_URL}/weeklyedition/"
-VERSION = "0.85.4"
+VERSION = "0.85.5"
 
 INDEX_TEMPLATE = "index.html"
 ARTICLE_TEMPLATE = "article.html"

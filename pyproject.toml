@@ -1,6 +1,6 @@
 [project]
 name = "digest"
-version = "0.85.1"
+version = "0.85.5"
 description = "Digest is a Python3 script that creates a local version of the weekly Economist magazine that aims to provide an improved reading and listening experience"
 readme = "README.md"
 requires-python = ">=3.10"

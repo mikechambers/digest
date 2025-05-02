@@ -1,5 +1,0 @@
-requests
-browsercookie
-beautifulsoup4
-readtime
-jinja2

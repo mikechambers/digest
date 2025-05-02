@@ -35,6 +35,7 @@ from bs4 import BeautifulSoup
 from jinja2 import Environment, FileSystemLoader
 import json
 from ollama import Ollama
+import time
 
 
 BASE_URL = "https://www.economist.com"
@@ -47,6 +48,8 @@ PODCAST_TEMPLATE = "podcast.xml"
 PODCAST_ITEM_TEMPLATE = "item.xml"
 
 STYLE_FILE = "style.css"
+
+RATE_LIMIT_RETRY_INTERVAL = 10
 
 user_agent = f"Digest/{VERSION}"
 verbose = False
@@ -696,6 +699,7 @@ def extract_date_from_url(url):
 
 # load a remote URL and return a Dict that contains a string of the data
 # and the final url that the data was loaded from (after re-directs)
+"""
 def load_url(url):
 
     if verbose:
@@ -708,7 +712,28 @@ def load_url(url):
         return {"text":response.text, "url":response.url}
     else:
         raise Exception(f"Non 200 Status code returned ({code}) : {url}")
+"""
 
+def load_url(url, retry_attempt=0):
+    if verbose:
+        print(f"Retrieving URL {url}")
+
+    response = session.get(url)
+    code = response.status_code
+    
+    if code == 200:
+        return {"text": response.text, "url": response.url}
+    elif code == 429 and retry_attempt == 0:
+        # Wait 10 seconds and try again
+        if verbose:
+            print(f"Rate limited (429). Waiting 10 seconds before retrying...")
+        
+        time.sleep(RATE_LIMIT_RETRY_INTERVAL)
+        
+        # Recursive call with retry_attempt=1 to track that we've tried once
+        return load_url(url, retry_attempt=1)
+    else:
+        raise Exception(f"Non 200 Status code returned ({code}) : {url}")
 # init the remote session and cookies that will be used for that session. This
 # is used to grab the cookies from the specified browser to provide access to logged
 # in content for the economist

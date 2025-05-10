@@ -49,7 +49,7 @@ PODCAST_ITEM_TEMPLATE = "item.xml"
 
 STYLE_FILE = "style.css"
 
-RATE_LIMIT_RETRY_INTERVAL = 10
+RATE_LIMIT_RETRY_INTERVAL = 30
 
 user_agent = f"Digest/{VERSION}"
 verbose = False
@@ -726,7 +726,7 @@ def load_url(url, retry_attempt=0):
     elif code == 429 and retry_attempt == 0:
         # Wait 10 seconds and try again
         if verbose:
-            print(f"Rate limited (429). Waiting 10 seconds before retrying...")
+            print(f"Rate limited (429). Waiting {RATE_LIMIT_RETRY_INTERVAL} seconds before retrying...")
         
         time.sleep(RATE_LIMIT_RETRY_INTERVAL)
         

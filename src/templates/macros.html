@@ -1,0 +1,16 @@
+<!-- macros.html -->
+{% macro render_summary(summary, relevance=None, header="Overview") %}
+    {% if summary %}
+        <div><b>{{header}}</b></div>
+        {% if relevance %}
+        <p>{{relevance}}</p>
+        {% endif %}
+        <div>
+            <ul>
+            {% for s in summary %}
+            <li>{{s}}</li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endmacro %}

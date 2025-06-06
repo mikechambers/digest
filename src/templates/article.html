@@ -1,3 +1,5 @@
+{% from 'macros.html' import render_summary %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -68,18 +70,8 @@
     </div>
     
     {% if summary %}
-        <div><b>Overview</b></div>
-        {% if relevance %}
-        <p>{{relevance}}</p>
-        {% endif %}
-        <div>
-            <ul>
-            {% for s in summary %}
-            <li>{{s}}</li>
-            {% endfor %}
-            </ul>
-    </div>
-        
+    {{ render_summary(summary, relevance) }}
+
     {% endif %}
 
     <div class="footer">

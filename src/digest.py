@@ -44,6 +44,7 @@ VERSION = "0.85.5"
 
 INDEX_TEMPLATE = "index.html"
 ARTICLE_TEMPLATE = "article.html"
+SUMMARY_TEMPLATE = "summary.md"
 PODCAST_TEMPLATE = "podcast.xml"
 PODCAST_ITEM_TEMPLATE = "item.xml"
 
@@ -88,11 +89,13 @@ SECTION_INFO = [
     
 ]
 
+
 """
 SECTION_INFO = [
     {"title": "United States", "slug": "/united-states/", "summarize":True},
 ]
 """
+
 
 
 
@@ -137,8 +140,12 @@ def main():
     sections = load_articles(sections)
 
     build_index(sections)
-    build_sections(sections)
-    build_podcast(sections)
+
+    #build_sections(sections)
+    #build_podcast(sections)
+
+    if create_summary:
+        build_summary(sections)
 
 
     if verbose:
@@ -239,6 +246,34 @@ def build_podcast(sections):
         print(f"Saving podcast file")
 
     write_file(output_dir, PODCAST_TEMPLATE, output)
+
+def build_summary(sections):
+    
+    global VERSION
+
+    if verbose:
+        print(f"Generating article files")
+
+    template = env.get_template(SUMMARY_TEMPLATE)
+
+    items = []
+
+    for section in sections:
+        for article in section["articles"]:
+            items.append({"article":article, "section":section})
+
+
+    context = {
+        'title':edition_date,
+        'items': items
+    }
+
+    output = template.render(context)
+    
+    #write out the article
+    write_file(output_dir, "summary.md", output)
+
+
 
 # write out section directories and individual articles based
 # on the parsed data

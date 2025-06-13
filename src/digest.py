@@ -141,8 +141,8 @@ def main():
 
     build_index(sections)
 
-    #build_sections(sections)
-    #build_podcast(sections)
+    build_sections(sections)
+    build_podcast(sections)
 
     if create_summary:
         build_summary(sections)

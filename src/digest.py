@@ -50,7 +50,7 @@ PODCAST_ITEM_TEMPLATE = "item.xml"
 
 STYLE_FILE = "style.css"
 
-RATE_LIMIT_RETRY_INTERVAL = 30
+RATE_LIMIT_RETRY_INTERVAL = 60
 
 user_agent = f"Digest/{VERSION}"
 verbose = False
@@ -610,6 +610,8 @@ def load_articles(sections):
             })
             article_section_index += 1
 
+            time.sleep(1)
+
             
 
 
@@ -769,6 +771,8 @@ def load_url(url, retry_attempt=0):
         return load_url(url, retry_attempt=1)
     else:
         raise Exception(f"Non 200 Status code returned ({code}) : {url}")
+    
+
 # init the remote session and cookies that will be used for that session. This
 # is used to grab the cookies from the specified browser to provide access to logged
 # in content for the economist
